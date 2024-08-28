@@ -22,6 +22,7 @@ class API::V1::UsersController < ApplicationController
   end
 
   def update
+    #byebug
     if @user.update(user_params)
       render :show, status: :ok, location: api_v1_users_path(@user)
     else
@@ -53,10 +54,11 @@ class API::V1::UsersController < ApplicationController
   end
 
   def user_params
-    params.fetch(:user, {}).permit(
-      :id, :first_name, :last_name, :email, :age,
-      address_attributes: [:id, :line1, :line2, :city, :country, :country_id, country_attributes: [:id, :name]],
-      reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]
-    )
+    params.fetch(:user, {}).
+        permit(:id, :first_name, :last_name, :email, :age,
+            { address_attributes: [:id, :line1, :line2, :city, :country, :country_id, 
+              country_attributes: [:id, :name]],
+              reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]
+            })
   end
 end
