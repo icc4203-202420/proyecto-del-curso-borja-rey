@@ -14,19 +14,19 @@ html {
   position: relative; /* Añadido para posicionar elementos dentro de este contenedor */
 }
 
-.imageContainer {
+.imageContainerHome {
   position: relative;
   width: 100%;
   max-width: 336px;
   margin: 0 auto;
 }
 
-.imageContainer img {
+.imageContainerHome img {
   width: 100%;
   height: auto;
 }
 
-.imageContainer .titulo {
+.imageContainerHome .titulo {
   position: absolute;
   top: 50%;
   left: 50%;

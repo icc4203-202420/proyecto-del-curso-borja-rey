@@ -3,17 +3,21 @@ import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
-import Search from './components/Search';
 import Beers from './components/Beers';
+import Users from './components/Users';
+import Bars from './components/Bars';
+import BarShow from './components/BarShow';
 
 function App() {
   return (
     <Router>
-      <Navbar /> {/* Incluye el componente Navbar */}
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/search" element={<Search />} />
         <Route path="/beers" element={<Beers />} />
+        <Route path="/bars" element={<Bars />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/bars/:id" element={<BarShow />} />
       </Routes>
     </Router>
   );

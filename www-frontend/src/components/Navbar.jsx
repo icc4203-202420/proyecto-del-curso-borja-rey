@@ -19,7 +19,10 @@ function Navbar() {
           <Link to="/" className="navbar-link">Mistbeer</Link>
         </Typography>
         <Button color="inherit">
-          <Link to="/" className="navbar-link">Bars</Link>
+          <Link to="/users" className="navbar-link">Users</Link>
+        </Button>
+        <Button color="inherit">
+          <Link to="/bars" className="navbar-link">Bars</Link>
         </Button>
         <Button color="inherit">
           <Link to="/beers" className="navbar-link">Beers</Link>

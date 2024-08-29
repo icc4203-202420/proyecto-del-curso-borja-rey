@@ -4,25 +4,25 @@ import SearchIcon from '@mui/icons-material/Search';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import './Beers.css'; // Import the CSS file
 
-function Beers() {
+function Users() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [beers, setBeers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Función para manejar la búsqueda de cervezas
+  // Función para manejar la búsqueda de usuarios
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/beers`);
+      const response = await fetch(`http://localhost:3001/api/v1/users`);
       const data = await response.json();
       
-      const filteredBeers = data.beers.filter(beer => 
-        beer.name.toLowerCase().includes(searchTerm.toLowerCase())
+      const filteredUsers = data.users.filter(user => 
+        user.handle.toLowerCase().includes(searchTerm.toLowerCase())
       );
       
-      setBeers(filteredBeers);
+      setUsers(filteredUsers);
     } catch (error) {
-      console.error('Error fetching beers:', error);
+      console.error('Error fetching users:', error);
     }
     setLoading(false);
   };
@@ -73,24 +73,24 @@ function Beers() {
           </IconButton>
         </Box>
 
-        {/* Lista de cervezas envuelta en un Paper */}
+        {/* Lista de usuarios envuelta en un Paper */}
         <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '80vh' }}>
           <List>
             {loading && <Typography>Loading...</Typography>}
-            {!loading && beers.length === 0 && <Typography>No beers found.</Typography>}
-            {beers.map((beer) => (
-              <React.Fragment key={beer.id}>
+            {!loading && users.length === 0 && <Typography>No users found.</Typography>}
+            {users.map((user) => (
+              <React.Fragment key={user.id}>
                 <ListItem>
                   <ListItemText
-                    primary={beer.name}
+                    primary={`${user.first_name} ${user.last_name} (${user.handle})`}
                     secondary={
                       <>
                         <Typography component="span" variant="body2" color="text.primary">
-                          {beer.style} - {beer.alcohol} - {beer.ibu}
+                          Email: {user.email}
                         </Typography>
                         <br />
                         <Typography component="span" variant="body2" color="text.secondary">
-                          Malts: {beer.malts} | Hop: {beer.hop} | Yeast: {beer.yeast}
+                          Edad: {user.age}
                         </Typography>
                       </>
                     }
@@ -106,4 +106,4 @@ function Beers() {
   );
 }
 
-export default Beers;
+export default Users;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Typography, Button, TextField, Box, InputAdornment, IconButton } from '@mui/material';
+import { Typography, Button, TextField, Box, InputAdornment, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import './Home.css';  // Importa el archivo CSS
@@ -13,8 +13,8 @@ function Home() {
   };
 
   return (
-    <Box className="box">
-      <div className="imageContainer">
+    <Box className="box nada">
+      <div className="imageContainerHome">
         <img
           src={BeerLogo}
           alt="Beer Logo"

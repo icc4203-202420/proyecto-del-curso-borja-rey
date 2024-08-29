@@ -1,26 +1,22 @@
-.beers-container {
-    padding: 20px;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-    text-align: left;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  tr:hover {
-    background-color: #ddd;
-  }
+
+.imageContainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1; /* Ensure it is behind other elements */
+  opacity: 0.25; /* Set opacity to 25% */
+  pointer-events: none; /* Ensure it does not interfere with other elements */
+  width: 100%;
+  max-width: 336px;
+  margin: 0 auto;
+}
+
+.imageContainer img {
+  width: 100%;
+  height: auto;
+}
+
+.buttonView {
+  background-color: #AF8F6F;
+}
