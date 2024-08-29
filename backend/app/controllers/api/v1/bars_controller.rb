@@ -13,12 +13,22 @@ class API::V1::BarsController < ApplicationController
 
   def show
     if @bar.image.attached?
-      render json: @bar.as_json(include: { address: { include: :country }, events: {} }).merge({ 
+      render json: @bar.as_json(include: { address: { include: :country } }).merge({ 
         image_url: url_for(@bar.image), 
         thumbnail_url: url_for(@bar.thumbnail) }),
         status: :ok
     else
       render json: { bar: @bar.as_json(include: { address: { include: :country }, events: {} }) }, status: :ok
+    end
+  end
+
+  def events
+    @bar = Bar.find_by(id: params[:id])
+    if @bar
+      @events = @bar.events
+      render json: { events: @events }, status: :ok
+    else
+      render json: { error: 'Bar not found' }, status: :not_found
     end
   end
 
