@@ -1,0 +1,14 @@
+.navbar-link {
+    color: black;
+    text-decoration: none;
+    font-family: "Belwe";
+  }
+  
+  .navbar-link:hover {
+    text-decoration: underline;
+  }
+
+    /* Añade un padding-top al body para evitar que el contenido se superponga con el navbar fijo */
+  body {
+    padding-top: 64px; /* Ajusta este valor según la altura de tu navbar */
+  }

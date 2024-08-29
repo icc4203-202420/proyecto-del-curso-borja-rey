@@ -1,0 +1,136 @@
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, rgba(175, 143, 111, 0.85) 75%, #FFFFFF 100%); /* Gradiente de color al 85% a blanco, comenzando en el 75% */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  text-align: center;
+  padding: 50px;
+  position: relative; /* Añadido para posicionar elementos dentro de este contenedor */
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  max-width: 336px;
+  margin: 0 auto;
+}
+
+.imageContainer img {
+  width: 100%;
+  height: auto;
+}
+
+.imageContainer .titulo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white; /* Ajusta el color del texto para que sea visible sobre la imagen */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Añade sombra al texto para mejor legibilidad */
+}
+
+.buttonBox {
+  text-align: center;
+  padding-top: 50px;
+}
+
+.buttonMap {
+  background-color: #74512D !important; /* Añade !important para aumentar la especificidad */
+  color: #FFFFFF !important;
+  font-size: 16px !important;
+  font-family: 'Belwe' !important;
+  font-weight: 700 !important;
+  line-height: 24px !important;
+  padding: 8px 16px !important;
+}
+
+.searchInput .MuiOutlinedInput-root {
+  border-radius: 16px; /* Ajusta el valor según tus necesidades */
+  background-color: #FFFFFF;
+  width: 500px;
+}
+
+.titulo {
+  color: var(--Schemes-Surface, #FEF7FF) !important;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) !important;
+  -webkit-text-stroke-width: 2px !important; /* Asegúrate de que el grosor del borde esté definido */
+  -webkit-text-stroke-color: #000 !important; /* Color del borde */
+  font-family: Belwe !important;
+  font-size: 85px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: var(--Title-Large-Line-Height, 28px) !important; /* 40% */
+  letter-spacing: var(--Title-Large-Tracking, 0px) !important;
+  width: 400px !important;
+  height: 33px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Media Queries para hacer la página responsiva */
+
+/* Para pantallas con un ancho máximo de 768px */
+/* Para pantallas con un ancho máximo de 768px */
+@media (max-width: 1024px) {
+  /* Aumenta el padding del contenedor principal */
+  .box {
+    padding: 40px;
+  }
+
+  /* Aumenta el tamaño máximo del contenedor de la imagen */
+  .imageContainer {
+    max-width: 600px;
+  }
+
+  /* Aumenta el tamaño de la fuente del título y ajusta su ancho */
+  .titulo {
+    font-size: 80px !important;
+    width: auto !important;
+  }
+
+  /* Hace que el campo de búsqueda ocupe el 100% del ancho disponible */
+  .searchInput .MuiOutlinedInput-root {
+    width: 100%;
+  }
+
+  /* Aumenta el tamaño de la fuente y el padding del botón */
+  .buttonMap {
+    font-size: 18px !important;
+    padding: 10px 20px !important;
+  }
+}
+
+/* Para pantallas con un ancho máximo de 480px */
+@media (max-width: 480px) {
+  /* Reduce aún más el padding del contenedor principal */
+  .box {
+    padding: 10px;
+  }
+
+  /* Ajusta el tamaño máximo del contenedor de la imagen */
+  .imageContainer {
+    max-width: 200px;
+  }
+
+  /* Reduce aún más el tamaño de la fuente del título y ajusta su ancho */
+  .titulo {
+    font-size: 40px !important;
+    width: auto !important;
+  }
+
+  /* Hace que el campo de búsqueda ocupe el 100% del ancho disponible */
+  .searchInput .MuiOutlinedInput-root {
+    width: 100%;
+  }
+
+  /* Reduce aún más el tamaño de la fuente y el padding del botón */
+  .buttonMap {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+  }
+}
