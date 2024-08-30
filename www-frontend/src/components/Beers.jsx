@@ -46,6 +46,9 @@ function Beers() {
           alt="Beer Logo"
         />
       </div>
+      <Typography variant="h4" sx={{ fontFamily: "Belwe", marginTop: '10%' }}>
+        Beers
+      </Typography>
       <Box className="boxTodo">
         <Box 
           sx={{
@@ -74,7 +77,7 @@ function Beers() {
         </Box>
 
         {/* Lista de cervezas envuelta en un Paper */}
-        <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '80vh' }}>
+        <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '70vh' }}>
           <List>
             {loading && <Typography>Loading...</Typography>}
             {!loading && beers.length === 0 && <Typography>No beers found.</Typography>}

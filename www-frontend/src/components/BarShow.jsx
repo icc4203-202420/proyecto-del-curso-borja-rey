@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper } from '@mui/material';
+import { Container, Typography, Box, Paper, Button, IconButton, Divider } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import './BarShow.css';
 
 function BarShow() {
   const { id } = useParams();
@@ -35,42 +37,79 @@ function BarShow() {
   }, [id]);
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return <Typography variant="h6">Loading...</Typography>;
   }
 
   if (!bar) {
-    return <Typography>Bar not found.</Typography>;
+    return <Typography variant="h6">Bar not found.</Typography>;
   }
 
   return (
-    <Container>
-      <Paper elevation={3} sx={{ padding: 2, marginTop: 2 }}>
-        <Typography variant="h4">{bar.name}</Typography>
-        <Box sx={{ marginTop: 2 }}>
-          <Typography variant="h6">Address</Typography>
-          <Typography>{bar.address.line1 || 'N/A'}, {bar.address.line2 || 'N/A'}</Typography>
-          <Typography>{bar.address.city || 'N/A'}, {bar.address.country ? bar.address.country.name : 'N/A'}</Typography>
-        </Box>
-        <Box sx={{ marginTop: 2 }}>
-          <Typography variant="h6">Details</Typography>
-          <Typography>Latitude: {bar.latitude}</Typography>
-          <Typography>Longitude: {bar.longitude}</Typography>
-        </Box>
-        <Box sx={{ marginTop: 2 }}>
-          <Typography variant="h6">Events</Typography>
-          {events.length > 0 ? (
-            events.map(event => (
-              <Box key={event.id} sx={{ marginTop: 1 }}>
-                <Typography variant="body1">{event.name}</Typography>
-                <Typography variant="body2">{event.description}</Typography>
-                <Typography variant="body2">{new Date(event.date).toLocaleDateString()}</Typography>
-              </Box>
-            ))
-          ) : (
-            <Typography>No events found.</Typography>
-          )}
-        </Box>
+    <Container maxWidth={false} disableGutters sx={{ height: '90vh', width: '100vh', display: 'flex', flexDirection: 'column' , fontFamily: 'Belwe'}}>
+      <Container maxWidth={false} disableGutters sx={{ width: '85%', marginBottom: '10px' }}>
+      <Paper elevation={4} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ padding: 1 }}>
+              <Typography variant="h5" sx={{ fontFamily: 'Belwe' }}>
+                {bar.name}
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                {bar.address.line1 || 'N/A'}, {bar.address.line2 || 'N/A'}
+              </Typography>
+          </Box>
+          <Box sx={{ position: 'relative' }}>
+            <img 
+              src="https://via.placeholder.com/400" // Cambia la URL por la imagen real del bar
+              alt={bar.name}
+              style={{ width: '100%', height: 'auto', maxHeight: '40vh', objectFit: 'cover' }}
+            />
+          </Box>
+          <Box sx={{padding: 0 }}>
+              <Typography variant="body2" color="textSecondary">
+                {bar.address.city || 'N/A'}, {bar.address.country ? bar.address.country.name : 'N/A'}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">Lat: {bar.latitude || 'N/A'}, Long: {bar.longitude || 'N/A'}</Typography>
+          </Box>
+          <Box sx={{ padding: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ flexGrow: 1 }}>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button variant="contained" class="buttonGo">
+                Go
+              </Button>
+              <Button variant="contained" class="buttonNewEvent">
+                New Event
+              </Button>
+              <IconButton color="secondary">
+                <FavoriteBorderIcon/>
+              </IconButton>
+            </Box>
+          </Box>
+        </Paper>
+      </Container>
+      <Container maxWidth={false} disableGutters sx={{ width: '70%' }}>
+        <Paper elevation={4} sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: "5px" }}>
+          <Box sx={{ padding: 1, overflowY: 'auto', flex: 1 }}>
+            <Typography variant="h6" sx={{ fontFamily: 'Belwe' }}>Events</Typography>
+            {events.length > 0 ? (
+              events.map(event => (
+                <Box key={event.id} sx={{ padding: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="body1">{event.name}</Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {new Date(event.date).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                  <Button  variant="text" class= "buttonEvent">
+                    View
+                  </Button>
+                </Box>
+              ))
+            ) : (
+              <Typography sx={{ padding: 1 }}>No events found.</Typography>
+            )}
+          </Box>
       </Paper>
+      </Container>
     </Container>
   );
 }

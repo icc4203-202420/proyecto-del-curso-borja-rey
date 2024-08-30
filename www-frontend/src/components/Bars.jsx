@@ -54,13 +54,16 @@ function Bars() {
   };
 
   return (
-    <Container sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
+    <Container sx={{ height: '100vh', overflowY: 'auto' }}>
       <div className="imageContainer">
         <img
           src={BeerLogo}
           alt="Beer Logo"
         />
       </div>
+      <Typography variant="h4" sx={{ fontFamily: "Belwe", marginTop: '11%' }}>
+        Bars
+      </Typography>
       <Box className="boxTodo">
         <Box 
           sx={{
@@ -88,7 +91,7 @@ function Bars() {
           </IconButton>
         </Box>
 
-        <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '80vh' }}>
+        <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '70vh' }}>
           <List>
             {loading && <Typography>Loading...</Typography>}
             {!loading && bars.length === 0 && <Typography>No bars found.</Typography>}
