@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import BeerLogo from '../assets/beerLogo.png';
 import './Beers.css';
-
+// si
 function Bars() {
   const [searchTerm, setSearchTerm] = useState('');
   const [bars, setBars] = useState([]);
