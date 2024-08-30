@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, Button } from '@mui/material';
+import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, Button, useTheme, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import BeerLogo from '../assets/beerLogo.png';
@@ -10,6 +10,10 @@ function Bars() {
   const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSearchBar = async () => {
     setLoading(true);
@@ -54,14 +58,14 @@ function Bars() {
   };
 
   return (
-    <Container sx={{ height: '100vh', overflowY: 'auto' }}>
+    <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <div className="imageContainer">
         <img
           src={BeerLogo}
           alt="Beer Logo"
         />
       </div>
-      <Typography variant="h4" sx={{ fontFamily: "Belwe", marginTop: '11%' }}>
+      <Typography variant="h4" sx={{ fontFamily: "Belwe" }}>
         Bars
       </Typography>
       <Box className="boxTodo">

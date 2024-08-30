@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper } from '@mui/material';
+import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, useTheme, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import './Beers.css'; // Import the CSS file
@@ -8,6 +8,10 @@ function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   // Función para manejar la búsqueda de usuarios
   const handleSearch = async () => {
@@ -39,7 +43,7 @@ function Users() {
 
   // Renderización del componente
   return (
-    <Container sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
+    <Container sx={{ maxHeight: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <div className="imageContainer">
         <img
           src={BeerLogo}

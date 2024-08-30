@@ -10,5 +10,5 @@
 
     /* Añade un padding-top al body para evitar que el contenido se superponga con el navbar fijo */
   body {
-    padding-top: 64px; /* Ajusta este valor según la altura de tu navbar */
+    padding-top: 10%; /* Ajusta este valor según la altura de tu navbar */
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Button, IconButton, Divider } from '@mui/material';
+import { Container, Typography, Box, Paper, Button, IconButton, useTheme, useMediaQuery } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import './BarShow.css';
@@ -9,6 +9,10 @@ function BarShow() {
   const [bar, setBar] = useState();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     const fetchBar = async () => {
@@ -45,8 +49,8 @@ function BarShow() {
   }
 
   return (
-    <Container maxWidth={false} disableGutters sx={{ height: '90vh', width: '100vh', display: 'flex', flexDirection: 'column' , fontFamily: 'Belwe'}}>
-      <Container maxWidth={false} disableGutters sx={{ width: '85%', marginBottom: '10px' }}>
+    <Container maxWidth={false} disableGutters sx={{ height: '100vh', width: isSmallScreen ? '100%' : '100vh', width: isMediumScreen ? "100%" : "100vh", display: 'flex', flexDirection: 'column' , fontFamily: 'Belwe', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
+      <Container maxWidth={false} disableGutters sx={{ width: isSmallScreen ? '100%' : '85%', width: isMediumScreen ? "100%" : "85%", marginBottom: '10px' }}>
       <Paper elevation={4} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ padding: 1 }}>
               <Typography variant="h5" sx={{ fontFamily: 'Belwe' }}>
@@ -86,7 +90,7 @@ function BarShow() {
           </Box>
         </Paper>
       </Container>
-      <Container maxWidth={false} disableGutters sx={{ width: '70%' }}>
+      <Container maxWidth={false} disableGutters sx={{ width: isSmallScreen ? '90%' : '70%', width: isMediumScreen ? "90%" : "70%" }}>
         <Paper elevation={4} sx={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: "5px" }}>
           <Box sx={{ padding: 1, overflowY: 'auto', flex: 1 }}>
             <Typography variant="h6" sx={{ fontFamily: 'Belwe' }}>Events</Typography>

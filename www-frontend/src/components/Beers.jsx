@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper } from '@mui/material';
+import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, useTheme, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import './Beers.css'; // Import the CSS file
@@ -8,6 +8,10 @@ function Beers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   // Función para manejar la búsqueda de cervezas
   const handleSearch = async () => {
@@ -39,14 +43,14 @@ function Beers() {
 
   // Renderización del componente
   return (
-    <Container sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
+    <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <div className="imageContainer">
         <img
           src={BeerLogo}
           alt="Beer Logo"
         />
       </div>
-      <Typography variant="h4" sx={{ fontFamily: "Belwe", marginTop: '10%' }}>
+      <Typography variant="h4" sx={{ fontFamily: "Belwe" }}>
         Beers
       </Typography>
       <Box className="boxTodo">
@@ -70,6 +74,8 @@ function Beers() {
             className="searchInput"
             value={searchTerm}
             onChange={handleChange}
+            fullWidth
+            sx={{flex: 1}}
           />
           <IconButton onClick={handleSearch} sx={{ marginLeft: 1 }}>
             <SearchIcon />
