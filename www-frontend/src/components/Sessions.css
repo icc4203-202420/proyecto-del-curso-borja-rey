@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    height: 100vh; /* Asegúrate de que el contenedor ocupe toda la altura de la ventana */
+}
+
+.title {
+    font-family: "Belwe" !important;
+}
+
+.submit-button {
+    background-color: #74512D !important;
+    font-family: "Belwe" !important;
+}
+
+.input {
+    background-color: white !important;
+    color: black !important;
+}
+
+.paper-session {
+    padding: 20px; /* Añade padding si es necesario */
+    width: 100%;
+}
+
+.error-message {
+    padding-bottom: 3%;
+}

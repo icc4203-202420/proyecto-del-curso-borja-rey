@@ -14,7 +14,8 @@ ReviewCounter.create(count: 0)
 if Rails.env.development?
 
   # Crear países
-  countries = FactoryBot.create_list(:country, 5)
+  countries = FactoryBot.create_list(:country, 20)
+  Country.create!(name: "El mejor pais de Chile")
 
   # Crear cervecerías (breweries) con marcas (brands) y cervezas (beers)
   countries.map do |country|

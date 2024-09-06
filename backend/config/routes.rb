@@ -28,6 +28,8 @@ Rails.application.routes.draw do
         resources :reviews, only: [:index]
       end
 
+      resources :addresses
+      resources :countries
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
     end
   end
