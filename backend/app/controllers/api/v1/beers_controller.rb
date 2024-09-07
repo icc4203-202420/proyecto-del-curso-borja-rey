@@ -18,17 +18,20 @@ class API::V1::BeersController < ApplicationController
   #   end
   #   render json: @beers
   # end
-  
+
   # GET /beers/:id
   def show
     if @beer.image.attached?
-      render json: @beer.as_json.merge({ 
-        image_url: url_for(@beer.image), 
-        thumbnail_url: url_for(@beer.thumbnail)}),
+      render json: @beer.merge({
+        image_url: url_for(@beer.image),
+        thumbnail_url: url_for(@beer.thumbnail),
+        brand: { include: :brewery }}),
         status: :ok
     else
-      render json: { beer: @beer.as_json }, status: :ok
-    end 
+      render json: @beer.as_json(include: {
+        brand: { include: :brewery }
+      }), status: :ok
+    end
   end
 
   # POST /beers
@@ -60,29 +63,39 @@ class API::V1::BeersController < ApplicationController
     head :no_content
   end
 
+  def bars
+    @beer = Beer.find_by(id: params[:id])
+    if @beer
+      @bars = @beer.bars
+      render json: { bars: @bars }, status: :ok
+    else
+      render json: { error: 'Beer not found' }, status: :not_found
+    end
+  end
+
   private
 
   def set_beer
     @beer = Beer.find_by(id: params[:id])
     render json: { error: 'Beer not found' }, status: :not_found if @beer.nil?
-  end  
+  end
 
   def beer_params
-    params.require(:beer).permit(:name, :beer_type, 
-      :style, :hop, :yeast, :malts, 
+    params.require(:beer).permit(:name, :beer_type,
+      :style, :hop, :yeast, :malts,
       :ibu, :alcohol, :blg, :brand_id, :avg_rating,
       :image_base64)
   end
 
   def handle_image_attachment
     decoded_image = decode_image(beer_params[:image_base64])
-    @beer.image.attach(io: decoded_image[:io], 
-      filename: decoded_image[:filename], 
+    @beer.image.attach(io: decoded_image[:io],
+      filename: decoded_image[:filename],
       content_type: decoded_image[:content_type])
-  end 
-  
+  end
+
   def verify_jwt_token
     authenticate_user!
     head :unauthorized unless current_user
-  end  
+  end
 end
