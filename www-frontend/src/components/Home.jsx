@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Button, TextField, Box, InputAdornment, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
@@ -13,7 +13,7 @@ function Home() {
   };
 
   return (
-    <Box className="box nada">
+    <Box className="box-nada">
       <div className="imageContainerHome">
         <img
           src={BeerLogo}
@@ -23,31 +23,31 @@ function Home() {
           Mistbeer
         </Typography>
       </div>
-      <TextField
-        label="Search"
-        variant="outlined"
-        className="searchInput"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={handleSearch}>
-                <SearchIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-      <Box className="buttonBox">
-        <Button
-          onClick={() => {}}
-          variant="contained"
-          className="buttonMap"
-        >
-          Open Map
-        </Button>
-      </Box>
+        <TextField
+          label="Search"
+          variant="outlined"
+          className="searchInput"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleSearch}>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Box className="buttonBox">
+          <Button
+            onClick={() => {}}
+            variant="contained"
+            className="buttonMap"
+          >
+            Open Map
+          </Button>
+        </Box>
     </Box>
   );
 }

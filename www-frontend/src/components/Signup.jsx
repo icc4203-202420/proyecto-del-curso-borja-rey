@@ -83,11 +83,10 @@ const Signup = () => {
             axios.post('http://localhost:3001/api/v1/signup', { user: userValues })
               .then(response => {
                 console.log('Signed up successfully:', response.data);
-                console.log("Nuevo usuario creado con id:", response.data["id"]);
-                const userId = response.data.id;
+                console.log("Nuevo usuario creado con id:", response.data.data.id);
+                const userId = response.data.data.id;
 
-                if (addressValues.line1 || addressValues.line2 || addressValues.city || addressValues.country) {
-
+                if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
                   axios.post('http://localhost:3001/api/v1/addresses', { address: { ...addressValues, country_id: countryId, user_id: userId } })
                     .then(addressResponse => {
                       console.log('Address created successfully:', addressResponse.data);
