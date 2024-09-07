@@ -11,6 +11,9 @@ import BeerShow from './components/BeerShow';
 import Login from './components/Login';
 import Signup from './components/Signup';
 
+const currentUser = localStorage.getItem('current_user');
+console.log('Current user:', currentUser.data.handle);
+
 function App() {
   return (
     <Router>
