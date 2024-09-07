@@ -7,6 +7,7 @@ import Beers from './components/Beers';
 import Users from './components/Users';
 import Bars from './components/Bars';
 import BarShow from './components/BarShow';
+import BeerShow from './components/BeerShow';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/beers" element={<Beers />} />
+        <Route path="/beers/:id" element={<BeerShow />} />
         <Route path="/bars" element={<Bars />} />
         <Route path="/users" element={<Users />} />
         <Route path="/bars/:id" element={<BarShow />} />

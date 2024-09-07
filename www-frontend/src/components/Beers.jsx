@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, useTheme, useMediaQuery } from '@mui/material';
+import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, Button, useTheme, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import './Beers.css'; // Import the CSS file
 
@@ -8,6 +9,7 @@ function Beers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -41,6 +43,9 @@ function Beers() {
     setSearchTerm(event.target.value);
   };
 
+  const handleViewClick = (id) => {
+    navigate(`/beers/${id}`);
+  };
   // Renderización del componente
   return (
     <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
@@ -104,6 +109,9 @@ function Beers() {
                       </>
                     }
                   />
+                  <Button variant="contained" class="buttonView" onClick={() => handleViewClick(beer.id)}>
+                    View
+                  </Button>
                 </ListItem>
                 <Divider />
               </React.Fragment>
