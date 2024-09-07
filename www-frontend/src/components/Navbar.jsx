@@ -12,7 +12,9 @@ import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
+
 function Navbar() {
+  const current_user = JSON.parse(localStorage.getItem('current_user'));
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = (open) => (event) => {
@@ -20,6 +22,11 @@ function Navbar() {
       return;
     }
     setDrawerOpen(open);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('current_user');
+    window.location.reload();
   };
 
   const drawerWidth = 300;
@@ -54,21 +61,43 @@ function Navbar() {
               <Link to="/" className="navbar-link">Home</Link>
             </Typography>
           </ListItem>
-          <ListItem button component={Link} to="/bars" onClick={toggleDrawer(false)}>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <Link to="/bars" className="navbar-link">Bars</Link>
-            </Typography>
-          </ListItem>
-          <ListItem button component={Link} to="/beers" onClick={toggleDrawer(false)}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <Link to="/beers" className="navbar-link">Beers</Link>
-            </Typography>
-          </ListItem>
-          <ListItem button component={Link} to="/users" onClick={toggleDrawer(false)}>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <Link to="/users" className="navbar-link">Users</Link>
-            </Typography>
-          </ListItem>
+          {current_user ? (
+            <>
+              <ListItem button component={Link} to="/bars" onClick={toggleDrawer(false)}>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link to="/bars" className="navbar-link">Bars</Link>
+                </Typography>
+              </ListItem>
+              <ListItem button component={Link} to="/beers" onClick={toggleDrawer(false)}>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link to="/beers" className="navbar-link">Beers</Link>
+                </Typography>
+              </ListItem>
+              <ListItem button component={Link} to="/users" onClick={toggleDrawer(false)}>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Link to="/users" className="navbar-link">Users</Link>
+                </Typography>
+              </ListItem>
+                <ListItem button onClick={handleLogout}>
+                  <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link to="/" className="navbar-link">Log out</Link>
+                  </Typography>
+                </ListItem>
+            </>
+          ) : (
+            <>
+              <ListItem button component={Link} to="/login" onClick={toggleDrawer(false)}>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link to="/login" className="navbar-link">Log in</Link>
+                </Typography>
+              </ListItem>
+              <ListItem button component={Link} to="/signup" onClick={toggleDrawer(false)}>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link to="/signup" className="navbar-link">Sign up</Link>
+                </Typography>
+              </ListItem>
+            </>
+          )}
         </List>
       </Drawer>
     </>

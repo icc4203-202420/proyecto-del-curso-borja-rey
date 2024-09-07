@@ -25,7 +25,7 @@ const Login = () => {
             axios.post('http://localhost:3001/api/v1/login', { user: values })
               .then(response => {
                 console.log('Logged in successfully:', response.data);
-                localStorage.setItem('current_user', response.data.status.data.user);
+                localStorage.setItem('current_user', JSON.stringify(response.data.status.data.user));
                 console.log('Current user:', response.data.status.data.user);
                 setSubmitting(false);
                 navigate('/'); // Redirige al home en caso de éxito

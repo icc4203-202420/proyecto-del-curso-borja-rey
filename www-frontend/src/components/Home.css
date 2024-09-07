@@ -72,6 +72,28 @@ html {
   flex-shrink: 0 !important;
 }
 
+.buttonLogin {
+  background-color: #F8F4E1 !important;
+  color: black !important;
+  font-size: 24px !important;
+  font-family: 'Belwe' !important;
+  font-weight: 1000 !important;
+  line-height: 32px !important;
+  padding: 12px 24px !important;
+  margin-right: 7% !important;
+}
+
+.buttonSignup {
+  background-color: #74512D !important;
+  color: white !important;
+  font-size: 24px !important;
+  font-family: 'Belwe' !important;
+  font-weight: 1000 !important;
+  line-height: 32px !important;
+  padding: 12px 24px !important;
+  margin-left: 7% !important;
+}
+
 /* Media Queries para hacer la página responsiva */
 
 /* Para pantallas con un ancho máximo de 768px */

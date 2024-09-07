@@ -56,7 +56,6 @@ function Bars() {
   const handleViewClick = (id) => {
     navigate(`/bars/${id}`);
   };
-
   return (
     <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <div className="imageContainer">

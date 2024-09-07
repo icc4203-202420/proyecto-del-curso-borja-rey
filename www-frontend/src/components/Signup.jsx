@@ -90,6 +90,7 @@ const Signup = () => {
                   axios.post('http://localhost:3001/api/v1/addresses', { address: { ...addressValues, country_id: countryId, user_id: userId } })
                     .then(addressResponse => {
                       console.log('Address created successfully:', addressResponse.data);
+                      localStorage.setItem('current_user', JSON.stringify(response.data.status.data.user));
                       setSubmitting(false);
                       navigate('/'); // Redirect on success
                     })
@@ -99,6 +100,7 @@ const Signup = () => {
                       setSubmitting(false);
                     });
                 } else {
+                  localStorage.setItem('current_user', JSON.stringify(response.data.status.data.user));
                   setSubmitting(false);
                   navigate('/'); // Redirect on success
                 }
