@@ -8,6 +8,8 @@ import Users from './components/Users';
 import Bars from './components/Bars';
 import BarShow from './components/BarShow';
 import BeerShow from './components/BeerShow';
+import Login from './components/Login';
+import Signup from './components/Signup';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/bars" element={<Bars />} />
         <Route path="/users" element={<Users />} />
         <Route path="/bars/:id" element={<BarShow />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
   );

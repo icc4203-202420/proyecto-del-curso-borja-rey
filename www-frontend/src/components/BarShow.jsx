@@ -103,7 +103,7 @@ function BarShow() {
                       {new Date(event.date).toLocaleDateString()}
                     </Typography>
                   </Box>
-                  <Button  variant="text" class= "buttonEvent">
+                  <Button  variant="text" className= "buttonEvent">
                     View
                   </Button>
                 </Box>

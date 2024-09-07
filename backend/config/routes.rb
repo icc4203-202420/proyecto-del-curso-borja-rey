@@ -9,6 +9,10 @@ Rails.application.routes.draw do
     registrations: 'api/v1/registrations'
   }
 
+  devise_scope :user do
+    get 'api/v1/sessions', to: 'api/v1/sessions#show'
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   namespace :api, defaults: { format: :json } do
@@ -32,6 +36,8 @@ Rails.application.routes.draw do
         resources :reviews, only: [:index]
       end
 
+      resources :addresses
+      resources :countries
       resources :reviews, only: [:index, :show, :create, :update, :destroy]
     end
   end
