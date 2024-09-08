@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Paper, Button, IconButton, useTheme, useMediaQuery, Divider } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import './BarShow.css';
+import './BeerShow.css';
 
 function BeerShow() {
   const { id } = useParams();
@@ -24,6 +24,7 @@ function BeerShow() {
   };
 
   const handleViewReviewsClick = (id) => {
+    localStorage.setItem("beer", id);
     navigate(`/beers/${id}/reviews`);
   };
 
@@ -54,7 +55,7 @@ function BeerShow() {
         const data = await response.json();
         setReviews(data.reviews || []);
         const rate = data.reviews.reduce((acc, review) => acc + parseFloat(review.rating), 0) / data.reviews.length;
-        const userReview = data.reviews.find(review => review.user.id === current_user.id);
+        const userReview = data.reviews.find(review => review.user_id === current_user.id);
         setUserReview(userReview);
         setRating(rate);
       } catch (error) {
@@ -112,10 +113,28 @@ function BeerShow() {
             </Box>
             <Box sx={{ padding: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'right' }}>
               <Box sx={{ flexGrow: 1 }}>
-                <Button variant="contained" color="primary" className="buttonFavorite" onClick={() => console.log('Favorite clicked')}>
+                <Button className="button-custom" sx={{ 
+                    backgroundColor: '#AF8F6F', 
+                    fontFamily: 'Belwe', 
+                    textTransform: 'none',
+                    color: 'white',
+                    mr: 1,
+                    '&:hover': { 
+                      backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                    } 
+                  }}  onClick={() => console.log('Favorite clicked')}>
                   <FavoriteBorderIcon /> Favorite
                 </Button>
-                <Button variant="contained" color="primary" className="buttonBack" onClick={() => handleViewReviewsClick(beer.id)}>
+                <Button className="button-custom" sx={{ 
+                  backgroundColor: '#AF8F6F', 
+                  fontFamily: 'Belwe', 
+                  textTransform: 'none',
+                  ml: 1,
+                  color: 'white', 
+                  '&:hover': { 
+                    backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                  } 
+                }} onClick={() => handleViewReviewsClick(beer.id)}>
                   Review
                 </Button>
               </Box>
@@ -135,7 +154,6 @@ function BeerShow() {
                     </Typography>
                   </Box>
                 </Box>
-                <Typography sx={{ padding: 1 }}>No review found.</Typography>
             </Box>
           </Paper>
         </Container>
@@ -150,7 +168,16 @@ function BeerShow() {
                     <Box>
                       <Typography variant="body1">{bar.name}</Typography>
                     </Box>
-                    <Button variant="contained" className="buttonView" onClick={() => handleViewBarClick(bar.id)}>
+                    <Button className="button-custom" sx={{ 
+                        backgroundColor: '#AF8F6F', 
+                        textTransform: 'none',
+                        fontFamily: 'Belwe', 
+                        textTransform: 'none',
+                        color: 'white', 
+                        '&:hover': { 
+                          backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                        } 
+                      }} onClick={() => handleViewBarClick(bar.id)}>
                       View
                     </Button>
                   </Box>

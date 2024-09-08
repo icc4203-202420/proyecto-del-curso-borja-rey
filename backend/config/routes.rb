@@ -39,7 +39,7 @@ Rails.application.routes.draw do
 
       resources :addresses
       resources :countries
-      resources :reviews, only: [:index, :show, :create, :update, :destroy]
+      resources :reviews
     end
   end
 end

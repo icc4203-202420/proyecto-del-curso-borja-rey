@@ -1,0 +1,27 @@
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/io-console-0.7.2/ext/io/console
+/home/vicenterey/.rvm/rubies/ruby-3.3.4/bin/ruby extconf.rb
+checking for rb_io_path()... yes
+checking for rb_io_descriptor()... yes
+checking for rb_io_get_write_io()... yes
+checking for rb_io_closed_p()... yes
+checking for rb_io_open_descriptor()... yes
+checking for termios.h... yes
+checking for cfmakeraw() in termios.h... yes
+checking for sys/ioctl.h... yes
+checking for HAVE_RUBY_FIBER_SCHEDULER_H... yes
+creating Makefile
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/io-console-0.7.2/ext/io/console
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-yupx7l sitelibdir\=./.gem.20240907-39185-yupx7l clean
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/io-console-0.7.2/ext/io/console
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-yupx7l sitelibdir\=./.gem.20240907-39185-yupx7l
+compiling console.c
+linking shared-object io/console.so
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/io-console-0.7.2/ext/io/console
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-yupx7l sitelibdir\=./.gem.20240907-39185-yupx7l install
+/usr/bin/install -m 0755 console.so ./.gem.20240907-39185-yupx7l/io
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/io-console-0.7.2/ext/io/console
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-yupx7l sitelibdir\=./.gem.20240907-39185-yupx7l clean

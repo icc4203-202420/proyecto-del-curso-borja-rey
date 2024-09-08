@@ -1,5 +1,6 @@
 class API::V1::ReviewsController < ApplicationController
   respond_to :json
+  before_action :set_beer, only: [:create]
   before_action :set_user, only: [:index, :create]
   before_action :set_review, only: [:show, :update, :destroy]
 
@@ -17,14 +18,18 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def create
-    @review = @user.reviews.build(review_params)
-    if @review.save
-      render json: @review, status: :created, location: api_v1_review_url(@review)
+    @review = @user.reviews.new(review_params)
+    @user_review = Review.where(user: @user, beer: @beer)
+    if @user_review.exists?
+      render json: { error: "User already reviewed this beer" }, status: :unprocessable_entity
     else
-      render json: @review.errors, status: :unprocessable_entity
+      if @review.save
+        render json: @review, status: :created, location: api_v1_review_url(@review)
+      else
+        render json: @review.errors, status: :unprocessable_entity
+      end
     end
   end
-
   def update
     if @review.update(review_params)
       render json: @review, status: :ok
@@ -46,14 +51,16 @@ class API::V1::ReviewsController < ApplicationController
   end
 
   def set_user
-    @user = User.find(params[:user_id]) 
+    @user = User.find(params[:review][:user_id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "User not found" }, status: :not_found
   end
 
   def set_beer
-    @beer = Beer.find(params[:beer_id])
+    @beer = Beer.find(params[:review][:beer_id])
   end
 
   def review_params
-    params.require(:review).permit(:id, :text, :rating, :beer_id)
+    params.require(:review).permit(:id, :text, :rating, :beer_id, :user_id)
   end
 end
