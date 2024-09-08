@@ -4,8 +4,8 @@ class API::V1::ReviewsController < ApplicationController
   before_action :set_review, only: [:show, :update, :destroy]
 
   def index
-    @reviews = Review.where(user: @user)
-    render json: { reviews: @reviews }, status: :ok
+    @reviews_user = Review.where(user: @user)
+    render json: { reviews_user: @reviews_user }, status: :ok
   end
 
   def show
@@ -47,6 +47,10 @@ class API::V1::ReviewsController < ApplicationController
 
   def set_user
     @user = User.find(params[:user_id]) 
+  end
+
+  def set_beer
+    @beer = Beer.find(params[:beer_id])
   end
 
   def review_params

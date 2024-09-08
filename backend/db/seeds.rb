@@ -50,4 +50,19 @@ if Rails.env.development?
     end
   end
 
+  # Crear reseñas para cervezas
+  beers = Beer.all
+  beers.each do |beer|
+    rand(1..5).times do
+      FactoryBot.create(:review, beer: beer, user: users.sample)
+    end
+  end
+
+  # Asociar cervezas con bares
+  bars.each do |bar|
+    bar.beers.each do |beer|
+      beer.bars << bar unless beer.bars.include?(bar)
+    end
+  end
+
 end

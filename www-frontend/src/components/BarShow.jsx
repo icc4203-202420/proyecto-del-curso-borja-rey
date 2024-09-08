@@ -9,6 +9,7 @@ function BarShow() {
   const [bar, setBar] = useState();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const current_user = JSON.parse(localStorage.getItem('current_user'));
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -49,6 +50,7 @@ function BarShow() {
   }
 
   return (
+    current_user ? (
     <Container maxWidth={false} disableGutters sx={{ height: '100vh', width: isSmallScreen ? '100%' : '100vh', width: isMediumScreen ? "100%" : "100vh", display: 'flex', flexDirection: 'column' , fontFamily: 'Belwe', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <Container maxWidth={false} disableGutters sx={{ width: isSmallScreen ? '100%' : '85%', width: isMediumScreen ? "100%" : "85%", marginBottom: '10px' }}>
       <Paper elevation={4} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -115,6 +117,21 @@ function BarShow() {
       </Paper>
       </Container>
     </Container>
+    ) : (
+      <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
+        <div className="imageContainer">
+          <img
+            src={BeerLogo}
+            alt="Beer Logo"
+          />
+        </div>
+        <Box className="boxTodo">
+          <Typography variant="h3" sx={{ fontFamily: "Belwe", color: "#000000", padding: "20px", marginTop: "50px"}}>
+            Error 401
+          </Typography>
+        </Box>
+      </Container>
+    )
   );
 }
 

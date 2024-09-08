@@ -8,8 +8,6 @@ import './Home.css';  // Importa el archivo CSS
 function Home() {
   const current_user = JSON.parse(localStorage.getItem('current_user'));
   const [searchQuery, setSearchQuery] = useState('');
-  const [login, setLogin] = useState(false);
-  const [signup, setSignup] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = () => {

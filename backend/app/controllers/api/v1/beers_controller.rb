@@ -12,13 +12,6 @@ class API::V1::BeersController < ApplicationController
     render json: { beers: @beers }, status: :ok
   end
 
-  # def index
-  #   @beers = Rails.cache.fetch("beers", expires_in: 12.hours) do
-  #     Beer.includes(:brand, :brewery).all
-  #   end
-  #   render json: @beers
-  # end
-
   # GET /beers/:id
   def show
     if @beer.image.attached?
@@ -68,6 +61,16 @@ class API::V1::BeersController < ApplicationController
     if @beer
       @bars = @beer.bars
       render json: { bars: @bars }, status: :ok
+    else
+      render json: { error: 'Beer not found' }, status: :not_found
+    end
+  end
+
+  def reviews
+    @beer = Beer.find_by(id: params[:id])
+    if @beer
+      @reviews = @beer.reviews
+      render json: { reviews: @reviews }, status: :ok
     else
       render json: { error: 'Beer not found' }, status: :not_found
     end

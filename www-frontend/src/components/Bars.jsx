@@ -4,12 +4,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import BeerLogo from '../assets/beerLogo.png';
 import './Beers.css';
-// si
+
 function Bars() {
   const [searchTerm, setSearchTerm] = useState('');
   const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const current_user = JSON.parse(localStorage.getItem('current_user'));
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -56,82 +57,100 @@ function Bars() {
   const handleViewClick = (id) => {
     navigate(`/bars/${id}`);
   };
-  return (
-    <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
-      <div className="imageContainer">
-        <img
-          src={BeerLogo}
-          alt="Beer Logo"
-        />
-      </div>
-      <Typography variant="h4" sx={{ fontFamily: "Belwe" }}>
-        Bars
-      </Typography>
-      <Box className="boxTodo">
-        <Box 
-          sx={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#d7b49e',
-            padding: '10px',
-            borderRadius: '8px',
-            marginBottom: '10px',
-            marginTop: '15px'
-          }}
-        >
-          <TextField
-            label="Search"
-            variant="outlined"
-            className="searchInput"
-            value={searchTerm}
-            onChange={handleChange}
-          />
-          <IconButton onClick={handleSearchBar} sx={{ marginLeft: 1 }}>
-            <SearchIcon />
-          </IconButton>
-        </Box>
 
-        <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '70vh' }}>
-          <List>
-            {loading && <Typography>Loading...</Typography>}
-            {!loading && bars.length === 0 && <Typography>No bars found.</Typography>}
-            {bars.map((bar) => (
-              <React.Fragment key={bar.id}>
-                <ListItem>
-                  <ListItemText
-                    primary={bar.name}
-                    secondary={
-                      bar.address ? (
-                        <>
-                          <Typography component="span" variant="body2" color="text.primary">
-                            {bar.address.line1 || 'N/A'} , {bar.address.line2 || 'N/A'}
-                          </Typography>
-                          <br />
+  return (
+    current_user ? (
+      <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
+        <div className="imageContainer">
+          <img
+            src={BeerLogo}
+            alt="Beer Logo"
+          />
+        </div>
+        <Typography variant="h4" sx={{ fontFamily: "Belwe" }}>
+          Bars
+        </Typography>
+        <Box className="boxTodo">
+          <Box 
+            sx={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#d7b49e',
+              padding: '10px',
+              borderRadius: '8px',
+              marginBottom: '10px',
+              marginTop: '15px',
+              border: '1px solid black'  // Add border style
+            }}
+          >
+            <TextField
+              label="Search"
+              variant="outlined"
+              className="searchInput"
+              value={searchTerm}
+              onChange={handleChange}
+            />
+            <IconButton onClick={handleSearchBar} sx={{ marginLeft: 1 }}>
+              <SearchIcon />
+            </IconButton>
+          </Box>
+
+          <Paper elevation={3} sx={{ backgroundColor: '#F8F4E1', fontFamily: "Belwe", overflowY: 'auto', maxHeight: '70vh' }}>
+            <List>
+              {loading && <Typography>Loading...</Typography>}
+              {!loading && bars.length === 0 && <Typography>No bars found.</Typography>}
+              {bars.map((bar) => (
+                <React.Fragment key={bar.id}>
+                  <ListItem>
+                    <ListItemText
+                      primary={bar.name}
+                      secondary={
+                        bar.address ? (
+                          <>
+                            <Typography component="span" variant="body2" color="text.primary">
+                              {bar.address.line1 || 'N/A'} , {bar.address.line2 || 'N/A'}
+                            </Typography>
+                            <br />
+                            <Typography component="span" variant="body2" color="text.secondary">
+                              {bar.address.country ? bar.address.country.name : 'N/A'} , {bar.address.city || 'N/A'}
+                            </Typography>
+                          </>
+                        ) : (
                           <Typography component="span" variant="body2" color="text.secondary">
-                            {bar.address.country ? bar.address.country.name : 'N/A'} , {bar.address.city || 'N/A'}
+                            Address not available
                           </Typography>
-                        </>
-                      ) : (
-                        <Typography component="span" variant="body2" color="text.secondary">
-                          Address not available
-                        </Typography>
-                      )
-                    }
-                  />
-                  <Button variant="contained" class="buttonView" onClick={() => handleViewClick(bar.id)}>
-                    View
-                  </Button>
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            ))}
-          </List>
-        </Paper>
-      </Box>
-    </Container>
+                        )
+                      }
+                    />
+                    <Button variant="contained" class="buttonView" onClick={() => handleViewClick(bar.id)}>
+                      View
+                    </Button>
+                  </ListItem>
+                  <Divider />
+                </React.Fragment>
+              ))}
+            </List>
+          </Paper>
+        </Box>
+      </Container>
+    ) : (
+      <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
+        <div className="imageContainer">
+          <img
+            src={BeerLogo}
+            alt="Beer Logo"
+          />
+        </div>
+        <Box className="boxTodo">
+          <Typography variant="h3" sx={{ fontFamily: "Belwe", color: "#000000", padding: "20px", marginTop: "50px"}}>
+            Error 401
+          </Typography>
+        </Box>
+      </Container>
+    )
   );
 }
 

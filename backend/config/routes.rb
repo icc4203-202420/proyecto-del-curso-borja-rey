@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       resources :beers do
         member do
           get 'bars', to: 'beers#bars'
+          get 'reviews', to: 'beers#reviews'
         end
       end
       resources :users do

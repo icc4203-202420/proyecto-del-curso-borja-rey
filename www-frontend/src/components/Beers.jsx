@@ -10,6 +10,7 @@ function Beers() {
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const current_user = JSON.parse(localStorage.getItem('current_user'));
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -48,6 +49,7 @@ function Beers() {
   };
   // Renderización del componente
   return (
+    current_user ? (
     <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <div className="imageContainer">
         <img
@@ -120,6 +122,21 @@ function Beers() {
         </Paper>
       </Box>
     </Container>
+    ) : (
+      <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
+        <div className="imageContainer">
+          <img
+            src={BeerLogo}
+            alt="Beer Logo"
+          />
+        </div>
+        <Box className="boxTodo">
+          <Typography variant="h3" sx={{ fontFamily: "Belwe", color: "#000000", padding: "20px", marginTop: "50px"}}>
+            Error 401
+          </Typography>
+        </Box>
+      </Container>
+    )
   );
 }
 

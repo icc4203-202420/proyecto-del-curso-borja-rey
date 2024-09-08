@@ -8,6 +8,7 @@ function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const current_user = JSON.parse(localStorage.getItem('current_user'));
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -20,10 +21,11 @@ function Users() {
       const response = await fetch(`http://localhost:3001/api/v1/users`);
       const data = await response.json();
       
-      const filteredUsers = data.users.filter(user => 
+      console.log('Datos recibidos:', data);  // Debug
+      const filteredUsers = data.filter(user => 
         user.handle.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      
+      console.log('Usuarios filtrados:', filteredUsers);  // Debug
       setUsers(filteredUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -43,6 +45,7 @@ function Users() {
 
   // Renderización del componente
   return (
+    current_user ? (
     <Container sx={{ maxHeight: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
       <div className="imageContainer">
         <img
@@ -50,7 +53,7 @@ function Users() {
           alt="Beer Logo"
         />
       </div>
-      <Typography variant="h4" sx={{ fontFamily: "Belwe", marginTop: '10px' }}>
+      <Typography variant="h4" sx={{ fontFamily: "Belwe" }}>
         Users
       </Typography>
       <Box className="boxTodo">
@@ -110,6 +113,21 @@ function Users() {
         </Paper>
       </Box>
     </Container>
+    ) : (
+      <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: isSmallScreen ? '30%' : '0', marginTop: isMediumScreen ? "30%" : "0" }}>
+        <div className="imageContainer">
+          <img
+            src={BeerLogo}
+            alt="Beer Logo"
+          />
+        </div>
+        <Box className="boxTodo">
+          <Typography variant="h3" sx={{ fontFamily: "Belwe", color: "#000000", padding: "20px", marginTop: "50px"}}>
+            Error 401
+          </Typography>
+        </Box>
+      </Container>
+    )
   );
 }
 
