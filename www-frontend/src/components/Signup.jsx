@@ -90,7 +90,7 @@ const Signup = () => {
                   axios.post('http://localhost:3001/api/v1/addresses', { address: { ...addressValues, country_id: countryId, user_id: userId } })
                     .then(addressResponse => {
                       console.log('Address created successfully:', addressResponse.data);
-                      localStorage.setItem('current_user', JSON.stringify(response.data.status.data.user));
+                      localStorage.setItem('current_user', JSON.stringify(response.data.data));
                       setSubmitting(false);
                       navigate('/'); // Redirect on success
                     })
@@ -100,14 +100,19 @@ const Signup = () => {
                       setSubmitting(false);
                     });
                 } else {
-                  localStorage.setItem('current_user', JSON.stringify(response.data.status.data.user));
+                  console.log("response.data.status.data.user: ", response.data.data);
+                  localStorage.setItem('current_user', JSON.stringify(response.data.data));
                   setSubmitting(false);
                   navigate('/'); // Redirect on success
                 }
               })
               .catch(error => {
-                console.error('Error signing up:', error);
-                setErrorMessage('Error al registrarse. Por favor, inténtalo de nuevo.');
+                if (error.response.status === 422) {
+                  setErrorMessage('Ya existe un usuario con esos datos');
+                } else {
+                  console.error('Error signing up:', error);
+                  setErrorMessage('Error al registrarse. Por favor, inténtalo de nuevo.');
+                }
                 setSubmitting(false);
               });
           }}
