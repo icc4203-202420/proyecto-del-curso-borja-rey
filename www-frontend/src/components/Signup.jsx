@@ -108,10 +108,10 @@ const Signup = () => {
               })
               .catch(error => {
                 if (error.response.status === 422) {
-                  setErrorMessage('Ya existe un usuario con esos datos');
+                  setErrorMessage('There is already a user with this email or handle.');
                 } else {
                   console.error('Error signing up:', error);
-                  setErrorMessage('Error al registrarse. Por favor, inténtalo de nuevo.');
+                  setErrorMessage('Error Signing up. Please try again.');
                 }
                 setSubmitting(false);
               });

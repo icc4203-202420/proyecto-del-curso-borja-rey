@@ -9,6 +9,7 @@ import BarShow from './components/BarShow';
 import BeerShow from './components/BeerShow';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Review from './components/Review';
 import './App.css';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/bars/:id" element={<BarShow />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/beers/:id/reviews" element={<Review />} />
       </Routes>
     </Router>
   );

@@ -1,0 +1,22 @@
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/bootsnap-1.18.4/ext/bootsnap
+/home/vicenterey/.rvm/rubies/ruby-3.3.4/bin/ruby extconf.rb
+checking for fdatasync() in unistd.h... yes
+checking for whether -D_GNU_SOURCE is accepted as CPPFLAGS... yes
+checking for whether -O3 is accepted as CFLAGS... yes
+checking for whether -std=c99 is accepted as CFLAGS... yes
+creating Makefile
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-2qvul0 sitelibdir\=./.gem.20240907-39185-2qvul0 clean
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-2qvul0 sitelibdir\=./.gem.20240907-39185-2qvul0
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.so
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-2qvul0 sitelibdir\=./.gem.20240907-39185-2qvul0 install
+/usr/bin/install -m 0755 bootsnap.so ./.gem.20240907-39185-2qvul0/bootsnap
+
+current directory: /home/vicenterey/proyectoApps/proyecto-del-curso-borja-rey/backend/vendor/bundle/ruby/3.3.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20240907-39185-2qvul0 sitelibdir\=./.gem.20240907-39185-2qvul0 clean
