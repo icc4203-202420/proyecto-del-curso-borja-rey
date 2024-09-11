@@ -10,6 +10,7 @@ import BeerShow from './components/BeerShow';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Review from './components/Review';
+import OpenMap from './components/OpenMap';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/beers/:id/reviews" element={<Review />} />
+          <Route path="/map" element={<OpenMap />} />
       </Routes>
     </Router>
   );

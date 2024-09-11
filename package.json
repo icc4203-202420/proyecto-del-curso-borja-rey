@@ -2,8 +2,13 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@googlemaps/js-api-loader": "^1.16.8",
+    "@googlemaps/markerclusterer": "^2.5.3",
     "@mui/material": "^6.0.0",
     "axios": "^1.7.5",
     "react-router-dom": "^6.26.1"
+  },
+  "devDependencies": {
+    "@types/google.maps": "^3.58.0"
   }
 }

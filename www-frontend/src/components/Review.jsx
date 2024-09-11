@@ -100,8 +100,7 @@ const Review = () => {
                         backgroundColor: '#AF8F6F', 
                         textTransform: 'none',
                         fontFamily: 'Belwe', 
-                        textTransform: 'none',
-                        color: 'white', 
+                        color: 'white',
                         '&:hover': { 
                           backgroundColor: '#8f7558'  // Un color más oscuro en el hover
                         } 

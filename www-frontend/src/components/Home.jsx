@@ -23,6 +23,10 @@ function Home() {
     navigate('/signup');
   }
 
+  const handleOpenMap = () => {
+    navigate('/map');
+  }
+
   return (
     <Box className="box-nada">
       <div className="imageContainerHome">
@@ -54,7 +58,7 @@ function Home() {
           />
           <Box className="buttonBox">
             <Button
-              onClick={() => {}}
+              onClick={() => {handleOpenMap()}}
               variant="contained"
               className="buttonMap"
             >
