@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Paper, Button, IconButton, useTheme, useMediaQuery } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import './BarShow.css';
 
@@ -11,9 +12,27 @@ function BarShow() {
   const [loading, setLoading] = useState(true);
   const current_user = JSON.parse(localStorage.getItem('current_user'));
 
+  const navigate = useNavigate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleCheckinEvent = (id) => {
+    const current_user = JSON.parse(localStorage.getItem('current_user'));
+    const userId = current_user.id;
+    const attendanceValues = {
+      user_id: userId,
+      event_id: id,
+      checked_in: true
+    };
+    axios.post('http://localhost:3001/api/v1/attendances', { attendance: attendanceValues })
+              .then(response => {
+                console.log('Attendance created successfully:', response.data);
+              })
+  };
+  const handleViewEventClick = (id) => {
+    navigate(`/events/${id}`);
+  };
 
   useEffect(() => {
     const fetchBar = async () => {
@@ -105,7 +124,29 @@ function BarShow() {
                       {new Date(event.date).toLocaleDateString()}
                     </Typography>
                   </Box>
-                  <Button  variant="text" class= "buttonEvent">
+                  <Button sx={{ 
+                        backgroundColor: '#AF8F6F', 
+                        textTransform: 'none',
+                        fontFamily: 'Belwe', 
+                        textTransform: 'none',
+                        color: 'white', 
+                        ml: 24,
+                        '&:hover': { 
+                          backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                        } 
+                      }} onClick={() => handleCheckinEvent(event.id)}>
+                      Check-in
+                    </Button>
+                  <Button  variant="text" sx={{ 
+                        backgroundColor: '#AF8F6F', 
+                        textTransform: 'none',
+                        fontFamily: 'Belwe', 
+                        textTransform: 'none',
+                        color: 'white', 
+                        '&:hover': { 
+                          backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                        } 
+                      }} onClick={() => handleViewEventClick(event.id)}>
                     View
                   </Button>
                 </Box>
