@@ -117,7 +117,7 @@ function BarShow() {
             <Typography variant="h6" sx={{ fontFamily: 'Belwe' }}>Events</Typography>
             {events.length > 0 ? (
               events.map(event => (
-                <Box key={event.id} sx={{ padding: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box key={event.id} sx={{ padding: 1, display: 'flex', alignItems: 'center' }}>
                   <Box>
                     <Typography variant="body1">{event.name}</Typography>
                     <Typography variant="body2" color="textSecondary">
@@ -130,9 +130,9 @@ function BarShow() {
                         fontFamily: 'Belwe', 
                         textTransform: 'none',
                         color: 'white', 
-                        ml: 24,
+                        marginLeft: "60%",
                         '&:hover': { 
-                          backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                          backgroundColor: '#8f7558'
                         } 
                       }} onClick={() => handleCheckinEvent(event.id)}>
                       Check-in
@@ -142,9 +142,10 @@ function BarShow() {
                         textTransform: 'none',
                         fontFamily: 'Belwe', 
                         textTransform: 'none',
-                        color: 'white', 
+                        color: 'white',
+                        marginLeft: "5%",
                         '&:hover': { 
-                          backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                          backgroundColor: '#8f7558'
                         } 
                       }} onClick={() => handleViewEventClick(event.id)}>
                     View
