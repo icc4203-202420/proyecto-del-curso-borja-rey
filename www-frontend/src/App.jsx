@@ -11,6 +11,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Review from './components/Review';
 import OpenMap from './components/OpenMap';
+import EventShow from './components/EventShow';
 import './App.css';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/bars" element={<Bars />} />
           <Route path="/users" element={<Users />} />
           <Route path="/bars/:id" element={<BarShow />} />
+          <Route path="/events/:id" element={<EventShow />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/beers/:id/reviews" element={<Review />} />

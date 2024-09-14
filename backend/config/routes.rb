@@ -22,7 +22,11 @@ Rails.application.routes.draw do
           get 'events', to: 'bars#events'
         end
       end
-      resources :events
+      resources :events do
+        member do
+          get 'attendances', to: 'events#attendances'
+        end
+      end
       resources :beers do
         member do
           get 'bars', to: 'beers#bars'
@@ -36,7 +40,7 @@ Rails.application.routes.draw do
         end
         resources :reviews, only: [:index]
       end
-
+      resources :attendances
       resources :addresses
       resources :countries
       resources :reviews
