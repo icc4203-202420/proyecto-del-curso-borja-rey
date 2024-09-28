@@ -80,6 +80,19 @@ class API::V1::EventsController < ApplicationController
     }, status: :ok
   end
 
+  def pictures
+    @event = Event.find(params[:id])
+    @pictures = @event.event_pictures
+
+    render json: {
+      pictures: @pictures.map { |picture|
+        picture.as_json.merge({
+          image_url: url_for(picture.picture)
+        })
+      }
+    }, status: :ok
+  end
+
   private
 
   def set_event
