@@ -35,7 +35,6 @@ const EventPictureForm = () => {
         .then(response => {
           console.log('Event picture created successfully:', response.data);
           setSubmitting(false);
-          localStorage.removeItem("event");
           navigate('/events/' + eventId + '/pictures');
         })
         .catch(error => {

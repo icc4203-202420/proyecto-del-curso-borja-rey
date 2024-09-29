@@ -6,7 +6,7 @@ class API::V1::EventPicturesController < ApplicationController
 
   def index
     @event_pictures = EventPicture.where(event_id: params[:event_id])
-    render json: @event_pictures.map { |picture| picture.as_json.merge(picture_url: url_for(picture.picture)) }
+    render json: @event_pictures.map { |picture| picture.as_json.merge(picture_url: url_for(picture.picture)) }, status: :ok
   end
 
   # GET /events/:id

@@ -4,7 +4,5 @@ class EventPicture < ApplicationRecord
 
   has_one_attached :picture
 
-  def thumbnail
-    picture.variant(resize_to_limit: [200, nil]).processed
-  end
+  validates :picture, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg']
 end

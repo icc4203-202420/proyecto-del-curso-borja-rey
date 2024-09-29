@@ -33,11 +33,9 @@ function EventPictures() {
               <Paper elevation={3} sx={{ padding: 2 }}>
                 <img
                   src={picture.picture_url}
-                  alt={picture.description}
-                  style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' }}
+                  style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '8px' }}
                 />
                 <Typography variant="body1" align="center" mt={1}>
-                  {picture.description}
                 </Typography>
               </Paper>
             </Grid>
