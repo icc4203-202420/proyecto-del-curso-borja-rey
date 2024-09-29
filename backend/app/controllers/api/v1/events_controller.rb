@@ -3,7 +3,7 @@ class API::V1::EventsController < ApplicationController
   include Authenticable
 
   respond_to :json
-  before_action :set_event, only: [:show, :update, :destroy]
+  before_action :set_event, only: [:show, :update, :destroy, :event_pictures]
   before_action :verify_jwt_token, only: [:create, :update, :destroy]
 
   def index
@@ -80,17 +80,11 @@ class API::V1::EventsController < ApplicationController
     }, status: :ok
   end
 
-  def pictures
-    @event = Event.find(params[:id])
-    @pictures = @event.event_pictures
-
-    render json: {
-      pictures: @pictures.map { |picture|
-        picture.as_json.merge({
-          image_url: url_for(picture.picture)
-        })
-      }
-    }, status: :ok
+  def event_pictures
+    @event_pictures = @event.event_pictures
+      render json: {
+        pictures: @event_pictures
+      }, status: :ok
   end
 
   private

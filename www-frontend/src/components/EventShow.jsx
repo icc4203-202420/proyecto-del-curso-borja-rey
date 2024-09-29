@@ -23,6 +23,11 @@ function EventShow() {
     navigate(`/events/${id}/pictures`);
   };
 
+  const handlePostPictureClick = (id) => {
+    localStorage.setItem("event", id);
+    navigate(`/events/${id}/picture`);
+  };
+
   const fetchAttendances = async () => {
     try {
       const response = await fetch(`http://localhost:3001/api/v1/events/${id}/attendances`);
@@ -140,13 +145,27 @@ function EventShow() {
                     textTransform: 'none',
                     color: 'white',
                     ml: 1,
+                    mr: 1,
                     '&:hover': { 
                       backgroundColor: '#8f7558'
                     } 
                   }}  
-                  onClick={() => handleViewPicturesClick(event.id)}
+                  onClick={() => handleViewPicturesClick(id)}
                 >
-                  Pictures
+                  Picture Gallery
+                </Button>
+                <Button className="button-custom" sx={{ 
+                  backgroundColor: '#AF8F6F', 
+                  fontFamily: 'Belwe', 
+                  textTransform: 'none',
+                  ml: 1,
+                  mr: 1,
+                  color: 'white', 
+                  '&:hover': { 
+                    backgroundColor: '#8f7558'
+                  } 
+                }} onClick={() => handlePostPictureClick(id)}>
+                  Post Picture
                 </Button>
               </Box>
             </Box>

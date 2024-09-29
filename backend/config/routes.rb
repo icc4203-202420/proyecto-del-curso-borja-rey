@@ -25,7 +25,7 @@ Rails.application.routes.draw do
       resources :events do
         member do
           get 'attendances', to: 'events#attendances'
-          get 'pictures', to: 'events#pictures'
+          get 'event_pictures', to: 'events#event_pictures'
         end
       end
       resources :beers do
@@ -45,6 +45,7 @@ Rails.application.routes.draw do
       resources :addresses
       resources :countries
       resources :reviews
+      resources :event_pictures
     end
   end
 end
