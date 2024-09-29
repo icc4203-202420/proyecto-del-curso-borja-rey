@@ -16,32 +16,38 @@ const EventPictureForm = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = (values, { setSubmitting }) => {
-  const current_user = JSON.parse(localStorage.getItem('current_user'));
-  const eventId = parseInt(localStorage.getItem("event"));
-
-    const eventPictureValues = {
-      description: values.description,
-      user_id: current_user.id,
-      event_id: eventId,
-      image_base64: values.image
+    const current_user = JSON.parse(localStorage.getItem('current_user'));
+    const eventId = parseInt(localStorage.getItem("event"));
+  
+    const reader = new FileReader();
+    reader.readAsDataURL(values.image);
+    reader.onloadend = () => {
+      const base64Image = reader.result.split(',')[1]; // Obtener solo la parte base64
+  
+      const eventPictureValues = {
+        description: values.description,
+        user_id: current_user.id,
+        event_id: eventId,
+        image_base64: base64Image
+      };
+  
+      axios.post('http://localhost:3001/api/v1/event_pictures', { event_picture: eventPictureValues })
+        .then(response => {
+          console.log('Event picture created successfully:', response.data);
+          setSubmitting(false);
+          localStorage.removeItem("event");
+          navigate('/events/' + eventId + '/pictures');
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 422) {
+            setErrorMessage('You already have uploaded a picture for this event.');
+          } else {
+            console.error('Error creating event picture:', error);
+            setErrorMessage('Error creating event picture. Please try again.');
+          }
+          setSubmitting(false);
+        });
     };
-
-    axios.post('http://localhost:3001/api/v1/event_pictures', { event_picture: eventPictureValues })
-      .then(response => {
-        console.log('Event picture created successfully:', response.data);
-        setSubmitting(false);
-        localStorage.removeItem("event");
-        navigate('/events/' + eventId + '/pictures');
-      })
-      .catch(error => {
-        if (error.response && error.response.status === 422) {
-          setErrorMessage('You already have uploaded a picture for this event.');
-        } else {
-          console.error('Error creating event picture:', error);
-          setErrorMessage('Error creating event picture. Please try again.');
-        }
-        setSubmitting(false);
-      });
   };
 
   return (

@@ -38,6 +38,7 @@ Rails.application.routes.draw do
         member do
           get 'friendships'
           post 'friendships', to: 'users#create_friendship'
+          post 'is_friend', to: 'users#is_friend'
         end
         resources :reviews, only: [:index]
       end

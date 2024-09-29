@@ -5,8 +5,8 @@ class API::V1::EventPicturesController < ApplicationController
   before_action :set_event, only: [:show, :update, :destroy]
 
   def index
-    @event_pictures = EventPicture.all
-    render json: @event_pictures, status: :ok
+    @event_pictures = EventPicture.where(event_id: params[:event_id])
+    render json: @event_pictures.map { |picture| picture.as_json.merge(picture_url: url_for(picture.picture)) }
   end
 
   # GET /events/:id
@@ -65,7 +65,12 @@ class API::V1::EventPicturesController < ApplicationController
   end
 
   def handle_image_attachment
-    decoded_image = decode_image(event_params[:image_base64])
-    @event_picture.flyer.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
+    decoded_image = decode_image(event_picture_params[:image_base64])
+    @event_picture.picture.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
+  end
+  def decode_image(base64_image)
+    decoded_data = Base64.decode64(base64_image)
+    io = StringIO.new(decoded_data)
+    { io: io, filename: "upload.jpg", content_type: "image/jpeg" }
   end
 end
