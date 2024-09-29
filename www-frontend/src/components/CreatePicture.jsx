@@ -4,6 +4,8 @@ import { Formik, Form, Field } from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
 import { TextField, Button, Box, Container, Paper, Typography, Grid } from '@mui/material';
+import './BarShow.css';
+
 
 // Validación del formulario usando Yup
 const EventPictureSchema = yup.object({

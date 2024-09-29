@@ -2,23 +2,31 @@ class API::V1::EventPicturesController < ApplicationController
   include ImageProcessing
 
   respond_to :json
-  before_action :set_event, only: [:show, :update, :destroy]
+  before_action :set_event_picture, only: [:show, :update, :destroy]
 
   def index
-    @event_pictures = EventPicture.where(event_id: params[:event_id])
+    @event_pictures = EventPicture.all
     render json: @event_pictures.map { |picture| picture.as_json.merge(picture_url: url_for(picture.picture)) }, status: :ok
   end
 
   # GET /event_pictures/:id
-  def show
-    if @event_picture.picture.attached?
-      render json: @event_picture.as_json.merge({
+def show
+  if @event_picture.picture.attached?
+    render json: {
+      event_picture: @event_picture.as_json.merge({
         picture_url: url_for(@event_picture.picture)
-      }), status: :ok
-    else
-      render json: @event_picture.as_json, status: :ok
-    end
+      }),
+      tags: @event_picture.tags.as_json(include: [:tagged_by, :tagged_user]),
+      user: @event_picture.user
+    }, status: :ok
+  else
+    render json: {
+      event_picture: @event_picture.as_json,
+      tags: @event_picture.tags,
+      user: @event_picture.user
+    }, status: :ok
   end
+end
 
   def create
     @event_picture = EventPicture.new(event_picture_params.except(:image_base64))
@@ -53,7 +61,6 @@ class API::V1::EventPicturesController < ApplicationController
 
   def set_event_picture
     @event_picture = EventPicture.find_by(id: params[:id])
-    render json: { error: 'Event Picture not found' }, status: :not_found unless @event
   end
 
   def event_picture_params

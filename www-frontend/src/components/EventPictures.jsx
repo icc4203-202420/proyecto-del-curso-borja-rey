@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Paper, Grid, Button } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
+import './BarShow.css';
 
 function EventPictures() {
   const { id } = useParams();
