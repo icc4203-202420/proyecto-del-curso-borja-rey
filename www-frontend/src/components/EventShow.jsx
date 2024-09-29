@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, Paper, Button, useTheme, useMediaQuery } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './BarShow.css';
 
 function EventShow() {
   const { id } = useParams();

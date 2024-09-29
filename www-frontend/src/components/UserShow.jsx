@@ -70,6 +70,7 @@ function UserShow() {
         axios.post(`http://localhost:3001/api/v1/users/${id}/friendships`, { friendship: friendshipValues })
             .then(response => {
                 console.log('Friendship created successfully:', response.data);
+                setIsFriend(true);
             })
             .catch(error => {
                 console.error('Error creating friendship:', error);

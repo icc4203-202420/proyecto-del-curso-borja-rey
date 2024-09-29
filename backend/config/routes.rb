@@ -42,11 +42,9 @@ Rails.application.routes.draw do
         end
         resources :reviews, only: [:index]
       end
-      resources :event_pictures do
-        member do
-          get "show", to: "event_pictures#show"
-        end
-      end
+
+      resources :tags
+      resources :event_pictures
       resources :attendances
       resources :addresses
       resources :countries

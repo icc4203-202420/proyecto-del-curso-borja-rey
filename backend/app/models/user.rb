@@ -18,6 +18,10 @@ class User < ApplicationRecord
   has_many :events, through: :attendances
   has_many :friendships
 
+  has_many :event_pictures
+  has_many :tagged_by, class_name: 'Tag', foreign_key: 'tagged_by_id'
+  has_many :tagged_user, class_name: 'Tag', foreign_key: 'tagged_user_id'
+
   accepts_nested_attributes_for :reviews, allow_destroy: true
   accepts_nested_attributes_for :address, allow_destroy: true
 
