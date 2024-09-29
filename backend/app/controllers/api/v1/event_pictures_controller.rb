@@ -9,18 +9,14 @@ class API::V1::EventPicturesController < ApplicationController
     render json: @event_pictures.map { |picture| picture.as_json.merge(picture_url: url_for(picture.picture)) }, status: :ok
   end
 
-  # GET /events/:id
+  # GET /event_pictures/:id
   def show
     if @event_picture.picture.attached?
       render json: @event_picture.as_json.merge({
-        image_url: url_for(@event_picture.picture),
-        thumbnail_url: url_for(@event_picture.thumbnail),
-        bar_name: @event_picture.bar.name
+        picture_url: url_for(@event_picture.picture)
       }), status: :ok
     else
-      render json: @event_picture.as_json.merge({
-        bar_name: @event_picture.bar.name
-      }), status: :ok
+      render json: @event_picture.as_json, status: :ok
     end
   end
 

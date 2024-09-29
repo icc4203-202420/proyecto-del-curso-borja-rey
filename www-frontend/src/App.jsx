@@ -14,7 +14,8 @@ import OpenMap from './components/OpenMap';
 import EventShow from './components/EventShow';
 import EventPictures from './components/EventPictures';
 import UserShow from './components/UserShow';
-import EventPicture from './components/EventPicture';
+import CreatePicture from './components/CreatePicture';
+import ShowPicture from './components/ShowPicture';
 import './App.css';
 
 function App() {
@@ -35,7 +36,8 @@ function App() {
           <Route path="/map" element={<OpenMap />} />
           <Route path="/events/:id/pictures" element={<EventPictures />} />
           <Route path="/users/:id" element={<UserShow />} />
-          <Route path="/events/:id/picture" element={<EventPicture />} />
+          <Route path="/events/:id/picture" element={<CreatePicture />} />
+          <Route path="/events_picture/:id" element={<ShowPicture />} />
       </Routes>
     </Router>
   );

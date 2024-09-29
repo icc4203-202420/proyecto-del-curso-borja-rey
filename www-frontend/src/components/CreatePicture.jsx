@@ -11,7 +11,7 @@ const EventPictureSchema = yup.object({
   image: yup.mixed().required('Image is required')
 });
 
-const EventPictureForm = () => {
+const CreatePictureForm = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -127,4 +127,4 @@ const EventPictureForm = () => {
   );
 };
 
-export default EventPictureForm;
+export default CreatePictureForm;
