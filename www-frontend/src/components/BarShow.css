@@ -7,3 +7,13 @@ background-color: #AF8F6F;
 .buttonEvent {
 background-color: #AF8F6F;
 }
+.buttonAdd {
+    background-color: #AF8F6F;
+    margin-left: 40px;
+    width: 250px;
+}
+.buttonIs {
+    background-color: #F8F4E1;
+    color: black;
+    border: 1px solid black;
+}

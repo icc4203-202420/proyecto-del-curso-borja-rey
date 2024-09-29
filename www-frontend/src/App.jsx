@@ -13,6 +13,7 @@ import Review from './components/Review';
 import OpenMap from './components/OpenMap';
 import EventShow from './components/EventShow';
 import EventPictures from './components/EventPictures';
+import UserShow from './components/UserShow';
 import './App.css';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path="/beers/:id/reviews" element={<Review />} />
           <Route path="/map" element={<OpenMap />} />
           <Route path="/events/:id/pictures" element={<EventPictures />} />
+          <Route path="/users/:id" element={<UserShow />} />
       </Routes>
     </Router>
   );

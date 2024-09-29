@@ -1,6 +1,5 @@
 class API::V1::UsersController < ApplicationController
   respond_to :json
-  before_action :authenticate_user!, only: [:create_friendship, :friendships]
   before_action :set_user, only: [:show, :update, :friendships, :create_friendship]
 
   def index
@@ -37,13 +36,34 @@ class API::V1::UsersController < ApplicationController
   end
 
   def create_friendship
-    friend = User.find(params[:friend_id])
-    @friendship = @user.friendships.build(friend: friend)
-
-    if @friendship.save
-      render json: @friendship, status: :ok
+    friendship_values = params.require(:friendship).permit(:user_id, :friend_id, :event_id)
+    puts "friendship_values: #{friendship_values}"
+    
+    event_id = friendship_values[:event_id].to_i == 0 ? nil : friendship_values[:event_id]
+  
+    if friendship_values[:user_id].to_i != @user.id
+      @friendship = Friendship.new(user_id: friendship_values[:user_id], friend_id: friendship_values[:friend_id], event_id: event_id)
+      
+      if @friendship.save
+        render json: @friendship, status: :ok
+      else
+        puts @friendship.errors.full_messages
+        render json: @friendship.errors, status: :unprocessable_entity
+      end
     else
-      render json: @friendship.errors, status: :unprocessable_entity
+      render json: { error: 'No puedes añadirte a ti mismo como amigo' }, status: :unprocessable_entity
+    end
+  end
+
+  def is_friend
+    friendship_values = params.require(:friendship).permit(:user_id, :friend_id)
+    @friendship = Friendship.where(user_id: friendship_values[:user_id], friend_id: friendship_values[:friend_id]).first
+    puts "is_friend_values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: #{friendship_values}"
+    puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!friendship: #{@friendship}"
+    if @friendship.present?
+      render json: { is_friend: true }, status: :ok
+    else
+      render json: { is_friend: false }, status: :ok
     end
   end
 

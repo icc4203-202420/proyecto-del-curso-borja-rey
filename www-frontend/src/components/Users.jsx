@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, useTheme, useMediaQuery } from '@mui/material';
+import { Container, Box, TextField, IconButton, List, ListItem, ListItemText, Divider, Typography, Paper, useTheme, useMediaQuery, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 import BeerLogo from '../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import './Beers.css'; // Import the CSS file
 
@@ -8,6 +9,7 @@ function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const current_user = JSON.parse(localStorage.getItem('current_user'));
 
   const theme = useTheme();
@@ -41,6 +43,10 @@ function Users() {
   // Función para manejar el cambio en el campo de búsqueda
   const handleChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleViewClick = (id) => {
+    navigate(`/users/${id}`);
   };
 
   // Renderización del componente
@@ -105,6 +111,9 @@ function Users() {
                       </>
                     }
                   />
+                  <Button variant="contained" class="buttonView" onClick={() => handleViewClick(user.id)}>
+                    View
+                  </Button>
                 </ListItem>
                 <Divider />
               </React.Fragment>
