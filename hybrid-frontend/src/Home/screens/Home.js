@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerLogo from '../../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 
 function Home() {
-  const current_user = JSON.parse(localStorage.getItem('current_user'));
+  const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await AsyncStorage.getItem('current_user');
+        if (user !== null) {
+          setCurrentUser(JSON.parse(user));
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   const handleSearch = () => {
     // Lógica de búsqueda aquí
@@ -35,7 +51,7 @@ function Home() {
         />
         <Text style={styles.title}>Mistbeer</Text>
       </View>
-      {current_user ? (
+      {currentUser ? (
         <>
           <TextInput
             style={styles.searchInput}
@@ -64,32 +80,48 @@ function Home() {
   );
 }
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    backgroundColor: 'rgba(175, 143, 111, 0.85)',
   },
   imageContainer: {
     alignItems: 'center',
     marginBottom: 32,
+    position: 'relative',
+    width: '100%',
+    maxWidth: 336,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: 'auto',
   },
   title: {
-    fontSize: 32,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -0.5 * width }, { translateY: -0.5 * width }],
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    fontSize: 85,
     fontWeight: 'bold',
-    marginTop: 16,
+    fontFamily: 'Belwe',
+    textAlign: 'center',
   },
   searchInput: {
     width: '100%',
     padding: 8,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 4,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
     marginBottom: 16,
   },
   searchButton: {
@@ -101,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mapButton: {
-    backgroundColor: '#AF8F6F',
+    backgroundColor: '#74512D',
     padding: 12,
     borderRadius: 4,
     width: '100%',
@@ -110,19 +142,28 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
+    paddingTop: 50,
   },
   loginButton: {
-    backgroundColor: '#AF8F6F',
+    backgroundColor: '#F8F4E1',
+    color: 'black',
+    fontSize: 24,
+    fontFamily: 'Belwe',
+    fontWeight: '1000',
+    lineHeight: 32,
     padding: 12,
-    borderRadius: 4,
     marginBottom: 16,
     width: '100%',
     alignItems: 'center',
   },
   signupButton: {
-    backgroundColor: '#AF8F6F',
+    backgroundColor: '#74512D',
+    color: 'white',
+    fontSize: 24,
+    fontFamily: 'Belwe',
+    fontWeight: '1000',
+    lineHeight: 32,
     padding: 12,
-    borderRadius: 4,
     width: '100%',
     alignItems: 'center',
   },
