@@ -34,40 +34,42 @@ function EventPictures() {
       <Typography variant="h4" sx={{ fontFamily: "Belwe" }}>
         Event Pictures
       </Typography>
-      <Grid container spacing={3} justifyContent="center">
-        {pictures.length > 0 ? (
-          pictures.map((picture) => (
-            <Grid item key={picture.id}>
-              <Paper elevation={3} sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <img
-                  src={picture.picture_url}
-                  style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }}
-                />
-                <Typography variant="body1" align="center" sx={{ fontFamily: "Belwe" }}>
-                  {picture.description}
-                </Typography>
-                <Button 
-                  className="button-custom" 
-                  sx={{ 
-                    backgroundColor: '#AF8F6F', 
-                    textTransform: 'none',
-                    fontFamily: 'Belwe', 
-                    color: 'white', 
-                    '&:hover': { 
-                      backgroundColor: '#8f7558'  // Un color más oscuro en el hover
-                    } 
-                  }} 
-                  onClick={() => handleViewPictureClick(picture.id)}
-                >
-                  View
-                </Button>
-              </Paper>
-            </Grid>
-          ))
-        ) : (
-          <Typography variant="body1">No pictures available</Typography>
-        )}
-      </Grid>
+      <Box sx={{ maxHeight: '500px', overflowY: 'auto', marginTop: 2 }}>
+        <Grid container spacing={3} justifyContent="center">
+          {pictures.length > 0 ? (
+            pictures.map((picture) => (
+              <Grid item key={picture.id}>
+                <Paper elevation={3} sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <img
+                    src={picture.picture_url}
+                    style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }}
+                  />
+                  <Typography variant="body1" align="center" sx={{ fontFamily: "Belwe" }}>
+                    {picture.description}
+                  </Typography>
+                  <Button 
+                    className="button-custom" 
+                    sx={{ 
+                      backgroundColor: '#AF8F6F', 
+                      textTransform: 'none',
+                      fontFamily: 'Belwe', 
+                      color: 'white', 
+                      '&:hover': { 
+                        backgroundColor: '#8f7558'  // Un color más oscuro en el hover
+                      } 
+                    }} 
+                    onClick={() => handleViewPictureClick(picture.id)}
+                  >
+                    View
+                  </Button>
+                </Paper>
+              </Grid>
+            ))
+          ) : (
+            <Typography variant="body1">No pictures available</Typography>
+          )}
+        </Grid>
+      </Box>
     </Container>
     ) : (
       <Container sx={{ height: '100vh', overflowY: 'auto', marginTop: '30%' }}>

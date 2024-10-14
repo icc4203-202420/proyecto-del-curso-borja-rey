@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
 import { TextField, Button, Box, Container, Paper, Typography, Grid } from '@mui/material';
-import './BarShow.css';
-
+import Webcam from 'react-webcam';
 
 // Validación del formulario usando Yup
 const EventPictureSchema = yup.object({
@@ -16,6 +15,8 @@ const EventPictureSchema = yup.object({
 const CreatePictureForm = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const webcamRef = useRef(null);
 
   const handleSubmit = (values, { setSubmitting }) => {
     const current_user = JSON.parse(localStorage.getItem('current_user'));
@@ -51,12 +52,22 @@ const CreatePictureForm = () => {
     };
   };
 
+  const capturePhoto = useCallback((setFieldValue) => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    fetch(imageSrc)
+      .then(res => res.blob())
+      .then(blob => {
+        setFieldValue("image", blob);
+        setCameraOpen(false);
+      });
+  }, [webcamRef]);
+
   return (
-    <Container className="container">
-      <Box mt={10}>
+    <Container>
+      <Box mt={10} sx={{ fontFamily: 'Belwe' }}> {/* Aplica la fuente a todo el formulario */}
         <Formik
           initialValues={{
-            event_id: '',  // Cambia esto si necesitas un valor predeterminado
+            event_id: '',
             description: '',
             image: null
           }}
@@ -64,13 +75,13 @@ const CreatePictureForm = () => {
           onSubmit={handleSubmit}
         >
           {({ errors, touched, isSubmitting, setFieldValue }) => (
-            <Paper elevation={4} sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: 3 }} className="paper-session">
-              <Typography variant="h4" gutterBottom className="title">
+            <Paper elevation={8} sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: 3 }}>
+              <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Belwe' }}> {/* Aplica la fuente al título */}
                 Upload Event Picture
               </Typography>
               <Form encType="multipart/form-data">
-                <Grid container spacing={2} direction="column">
-
+                <Grid container spacing={4} direction="column">
+                  
                   {/* Campo para la descripción */}
                   <Grid item>
                     <Field
@@ -80,6 +91,7 @@ const CreatePictureForm = () => {
                       fullWidth
                       error={touched.description && !!errors.description}
                       helperText={touched.description && errors.description}
+                      sx={{ fontFamily: 'Belwe' }} 
                     />
                   </Grid>
 
@@ -90,16 +102,58 @@ const CreatePictureForm = () => {
                       name="image"
                       type="file"
                       accept="image/*"
+                      capture="user" // Permite capturar una imagen desde la cámara en dispositivos móviles
                       onChange={(event) => {
                         setFieldValue("image", event.currentTarget.files[0]);
                       }}
+                      style={{ fontFamily: 'Belwe' }}
                     />
                     {touched.image && errors.image && (
-                      <Typography color="error">{errors.image}</Typography>
+                      <Typography color="error" sx={{ fontFamily: 'Belwe' }}>{errors.image}</Typography>
                     )}
                   </Grid>
 
-                  {/* Botón de envío */}
+                  {/* Botón para abrir la cámara */}
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      onClick={() => setCameraOpen(true)}
+                      sx={{
+                        backgroundColor: '#AF8F6F',
+                        textTransform: 'none',
+                        color: 'white',
+                        fontFamily: 'Belwe' // Aplica la fuente al botón
+                      }}
+                    >
+                      Open Camera
+                    </Button>
+                  </Grid>
+
+                  {/* Mostrar cámara si se ha abierto */}
+                  {cameraOpen && (
+                    <Grid item>
+                      <Webcam
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        width="100%"
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={() => capturePhoto(setFieldValue)}
+                        sx={{
+                          backgroundColor: '#AF8F6F',
+                          textTransform: 'none',
+                          color: 'white',
+                          fontFamily: 'Belwe' // Aplica la fuente al botón
+                        }}
+                      >
+                        Capture Photo
+                      </Button>
+                    </Grid>
+                  )}
+
+                  {/* Botón de enviar */}
                   <Grid item>
                     <Button
                       type="submit"
@@ -107,17 +161,14 @@ const CreatePictureForm = () => {
                       sx={{
                         backgroundColor: '#AF8F6F',
                         textTransform: 'none',
-                        fontFamily: 'Belwe',
                         color: 'white',
-                        '&:hover': {
-                          backgroundColor: '#8f7558'  // Un color más oscuro en el hover
-                        }
+                        fontFamily: 'Belwe' // Aplica la fuente al botón
                       }}
                       disabled={isSubmitting}
                     >
                       Submit
                     </Button>
-                    {errorMessage && <Typography color="error">{errorMessage}</Typography>}
+                    {errorMessage && <Typography color="error" sx={{ fontFamily: 'Belwe' }}>{errorMessage}</Typography>}
                   </Grid>
                 </Grid>
               </Form>
