@@ -7,8 +7,7 @@ export default function BeersScreen() {
   const [searchTerm, setSearchTerm] = useState('');
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();  // Para la navegación entre pantallas
-  const current_user = JSON.parse(localStorage.getItem('current_user'));  // Obtener usuario actual
+  const navigation = useNavigation();
 
   // Función para buscar cervezas
   const handleSearch = async () => {
@@ -16,8 +15,6 @@ export default function BeersScreen() {
     try {
       const response = await fetch('http://localhost:3001/api/v1/beers');
       const data = await response.json();
-      
-      // Filtrar cervezas según el término de búsqueda
       const filteredBeers = data.beers.filter(beer => 
         beer.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -36,18 +33,8 @@ export default function BeersScreen() {
     navigation.navigate('BeerDetails', { id });  // Navegar a la pantalla de detalles de la cerveza
   };
 
-  if (!current_user) {
-    return (
-      <View style={styles.container}>
-        <Image source={BeerLogo} style={styles.logo} />
-        <Text style={styles.errorText}>Error 401</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <Image source={BeerLogo} style={styles.logo} />
       <Text style={styles.title}>Beers</Text>
       <View style={styles.searchContainer}>
         <TextInput
@@ -164,11 +151,5 @@ const styles = StyleSheet.create({
   viewButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  errorText: {
-    fontSize: 24,
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 50,
   },
 });

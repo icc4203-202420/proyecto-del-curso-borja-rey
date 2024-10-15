@@ -7,24 +7,17 @@ export default function BarsScreen() {
   const [searchTerm, setSearchTerm] = useState('');
   const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();  // Para navegar entre pantallas
-  const current_user = JSON.parse(localStorage.getItem('current_user'));  // Obtener usuario actual
+  const navigation = useNavigation();
 
   const handleSearchBar = async () => {
     setLoading(true);
     try {
       const response = await fetch('http://localhost:3001/api/v1/bars');
       const data = await response.json();
-      
-      // Filtrar los bares basados en el término de búsqueda
-      if (Array.isArray(data.bars)) {
-        const filteredBars = data.bars.filter(bar => 
-          bar.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setBars(filteredBars);
-      } else {
-        console.error('Los datos recibidos no contienen un array de bares');
-      }
+      const filteredBars = data.bars.filter(bar => 
+        bar.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setBars(filteredBars);
     } catch (error) {
       console.error('Error fetching bars:', error);
     }
@@ -39,18 +32,8 @@ export default function BarsScreen() {
     navigation.navigate('BarDetails', { id });  // Navegar a la pantalla de detalles de un bar
   };
 
-  if (!current_user) {
-    return (
-      <View style={styles.container}>
-        <Image source={BeerLogo} style={styles.logo} />
-        <Text style={styles.errorText}>Error 401</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <Image source={BeerLogo} style={styles.logo} />
       <Text style={styles.title}>Bars</Text>
       <View style={styles.searchContainer}>
         <TextInput
@@ -166,11 +149,5 @@ const styles = StyleSheet.create({
   viewButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  errorText: {
-    fontSize: 24,
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 50,
   },
 });
