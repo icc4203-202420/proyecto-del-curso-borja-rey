@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
-import axios from 'axios';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, AsyncStorage } from 'react-native';
 
 const LoginSchema = yup.object({
   email: yup.string().email('Invalid email').required('The email is necessary to login'),
@@ -20,11 +19,18 @@ const Login = () => {
         initialValues={{ email: '', password: '' }}
         validationSchema={LoginSchema}
         onSubmit={(values, { setSubmitting }) => {
-          axios.post('http://localhost:3001/api/v1/login', { user: values })
-            .then(response => {
-              console.log('Logged in successfully:', response.data);
-              AsyncStorage.setItem('current_user', JSON.stringify(response.data.status.data.user));
-              console.log('Current user:', response.data.status.data.user);
+          fetch('http://localhost:3001/api/v1/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user: values }), // Enviar los valores de usuario
+          })
+            .then(response => response.json()) // Convertir la respuesta a JSON
+            .then(data => {
+              console.log('Logged in successfully:', data);
+              AsyncStorage.setItem('current_user', JSON.stringify(data.status.data.user));
+              console.log('Current user:', data.status.data.user);
               setSubmitting(false);
               navigation.navigate('Home'); // Redirige al home en caso de éxito
             })

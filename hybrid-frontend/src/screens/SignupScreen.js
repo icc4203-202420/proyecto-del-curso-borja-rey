@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
-import axios from 'axios';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, AsyncStorage } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 const SignupSchema = yup.object({
@@ -58,7 +57,7 @@ const Signup = () => {
           country: ''
         }}
         validationSchema={SignupSchema}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={async (values, { setSubmitting }) => {
           const userValues = {
             first_name: values.first_name,
             last_name: values.last_name,
@@ -77,41 +76,50 @@ const Signup = () => {
 
           const countryId = values.country;
 
-          axios.post('http://localhost:3001/api/v1/signup', { user: userValues })
-            .then(response => {
-              console.log('Signed up successfully:', response.data);
-              console.log("Nuevo usuario creado con id:", response.data.data.id);
-              const userId = response.data.data.id;
-
-              if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
-                axios.post('http://localhost:3001/api/v1/addresses', { address: { ...addressValues, country_id: countryId, user_id: userId } })
-                  .then(addressResponse => {
-                    console.log('Address created successfully:', addressResponse.data);
-                    AsyncStorage.setItem('current_user', JSON.stringify(response.data.data));
-                    setSubmitting(false);
-                    navigation.navigate('Home'); // Redirect on success
-                  })
-                  .catch(addressError => {
-                    console.error('Error creating address:', addressError);
-                    setErrorMessage('Error al crear la dirección. Por favor, inténtalo de nuevo.');
-                    setSubmitting(false);
-                  });
-              } else {
-                console.log("response.data.status.data.user: ", response.data.data);
-                AsyncStorage.setItem('current_user', JSON.stringify(response.data.data));
-                setSubmitting(false);
-                navigation.navigate('Home'); // Redirect on success
-              }
-            })
-            .catch(error => {
-              if (error.response.status === 422) {
-                setErrorMessage('There is already a user with this email or handle.');
-              } else {
-                console.error('Error signing up:', error);
-                setErrorMessage('Error Signing up. Please try again.');
-              }
-              setSubmitting(false);
+          try {
+            const response = await fetch('http://localhost:3001/api/v1/signup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ user: userValues }),
             });
+
+            const data = await response.json();
+            console.log('Signed up successfully:', data);
+            console.log("Nuevo usuario creado con id:", data.data.id);
+            const userId = data.data.id;
+
+            if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
+              const addressResponse = await fetch('http://localhost:3001/api/v1/addresses', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  address: { ...addressValues, country_id: countryId, user_id: userId },
+                }),
+              });
+
+              const addressData = await addressResponse.json();
+              console.log('Address created successfully:', addressData);
+              AsyncStorage.setItem('current_user', JSON.stringify(data.data));
+              setSubmitting(false);
+              navigation.navigate('Home');
+            } else {
+              AsyncStorage.setItem('current_user', JSON.stringify(data.data));
+              setSubmitting(false);
+              navigation.navigate('Home');
+            }
+          } catch (error) {
+            if (error.response && error.response.status === 422) {
+              setErrorMessage('There is already a user with this email or handle.');
+            } else {
+              console.error('Error signing up:', error);
+              setErrorMessage('Error Signing up. Please try again.');
+            }
+            setSubmitting(false);
+          }
         }}
       >
         {({ errors, touched, isSubmitting, handleSubmit }) => (
