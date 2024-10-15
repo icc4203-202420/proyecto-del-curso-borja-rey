@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BeerLogo from '../../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
+import BeerLogo from '../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 
-function Home() {
+function Home({ navigation }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -30,11 +30,11 @@ function Home() {
   };
 
   const handleLogin = () => {
-    navigation.navigate('../../Authentication/screens/LoginScreen');
+    navigation.navigate('Login');
   };
 
   const handleSignup = () => {
-    navigation.navigate('../../Authentication/screens/SignupScreen');
+    navigation.navigate('Signup');
   };
 
   const handleOpenMap = () => {

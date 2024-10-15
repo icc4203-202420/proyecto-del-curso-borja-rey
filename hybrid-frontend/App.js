@@ -2,14 +2,11 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 
-import HomeNavigation from "./src/Home/navigation/HomeNavigation";
+import React from 'react';
+import AppNavigation from './AppNavigation';
 
 export default function App() {
-  return (
-    <NavigationContainer>
-      <HomeNavigation />
-    </NavigationContainer>
-  );
+  return <AppNavigation />;
 }
 
 const styles = StyleSheet.create({
