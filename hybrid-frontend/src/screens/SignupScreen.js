@@ -29,7 +29,7 @@ const Signup = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/v1/countries`);
+        const response = await fetch(`http://192.168.1.20:3001/api/v1/countries`);
         const data = await response.json();
         setCountries(data);
       } catch (error) {
@@ -77,7 +77,7 @@ const Signup = () => {
           const countryId = values.country;
 
           try {
-            const response = await fetch('http://localhost:3001/api/v1/signup', {
+            const response = await fetch(`http://192.168.1.20:3001/api/v1/signup`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ const Signup = () => {
             const userId = data.data.id;
 
             if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
-              const addressResponse = await fetch('http://localhost:3001/api/v1/addresses', {
+              const addressResponse = await fetch(`http://192.168.1.20:3001/api/v1/addresses`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
