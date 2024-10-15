@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerLogo from '../../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
@@ -30,11 +30,11 @@ function Home() {
   };
 
   const handleLogin = () => {
-    // navigation.navigate('Login');
+    navigation.navigate('../../Authentication/screens/LoginScreen');
   };
 
   const handleSignup = () => {
-    // navigation.navigate('Signup');
+    navigation.navigate('../../Authentication/screens/SignupScreen');
   };
 
   const handleOpenMap = () => {
@@ -80,48 +80,32 @@ function Home() {
   );
 }
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: 'rgba(175, 143, 111, 0.85)',
   },
   imageContainer: {
     alignItems: 'center',
     marginBottom: 32,
-    position: 'relative',
-    width: '100%',
-    maxWidth: 336,
   },
   logo: {
-    width: '100%',
-    height: 'auto',
+    width: 150,
+    height: 150,
   },
   title: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -0.5 * width }, { translateY: -0.5 * width }],
-    color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
-    fontSize: 85,
+    fontSize: 32,
     fontWeight: 'bold',
-    fontFamily: 'Belwe',
-    textAlign: 'center',
+    marginTop: 16,
   },
   searchInput: {
     width: '100%',
     padding: 8,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 4,
     marginBottom: 16,
   },
   searchButton: {
@@ -133,7 +117,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mapButton: {
-    backgroundColor: '#74512D',
+    backgroundColor: '#AF8F6F',
     padding: 12,
     borderRadius: 4,
     width: '100%',
@@ -142,28 +126,19 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingTop: 50,
   },
   loginButton: {
-    backgroundColor: '#F8F4E1',
-    color: 'black',
-    fontSize: 24,
-    fontFamily: 'Belwe',
-    fontWeight: '1000',
-    lineHeight: 32,
+    backgroundColor: '#AF8F6F',
     padding: 12,
+    borderRadius: 4,
     marginBottom: 16,
     width: '100%',
     alignItems: 'center',
   },
   signupButton: {
-    backgroundColor: '#74512D',
-    color: 'white',
-    fontSize: 24,
-    fontFamily: 'Belwe',
-    fontWeight: '1000',
-    lineHeight: 32,
+    backgroundColor: '#AF8F6F',
     padding: 12,
+    borderRadius: 4,
     width: '100%',
     alignItems: 'center',
   },
