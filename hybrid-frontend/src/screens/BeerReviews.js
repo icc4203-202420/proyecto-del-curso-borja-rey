@@ -68,7 +68,7 @@ const BeerReviews = () => {
             console.log('Review created successfully:', data);
             setSubmitting(false);
             await AsyncStorage.removeItem("beer");
-            navigation.navigate('BeerShow', { id: beerId });
+            navigation.navigate('BeerShow', { id: beerId, refresh: true });
           } catch (error) {
             if (error.response && error.response.status === 422) {
               setErrorMessage('You already have a review for this beer.');

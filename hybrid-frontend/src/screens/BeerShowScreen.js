@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Añadir useCallback
 import { View, Text, Image, Button, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; // Añadir useFocusEffect
 import { IP_BACKEND } from '@env';
 
 function BeerShow() {
   const route = useRoute();
-  const { id } = route.params;
+  const { id, refresh } = route.params;
   const [beer, setBeer] = useState(null);
   const [bars, setBars] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -72,6 +72,54 @@ function BeerShow() {
     AsyncStorage.setItem("beer", id.toString());
     navigation.navigate('BeerReviews', { id });
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchCurrentUser = async () => {
+        const user = await AsyncStorage.getItem('current_user');
+        setCurrentUser(JSON.parse(user));
+      };
+
+      const fetchBeer = async () => {
+        try {
+          const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}`);
+          const data = await response.json();
+          setBeer(data);
+        } catch (error) {
+          console.error('Error fetching beer:', error);
+        }
+      };
+
+      const fetchBars = async () => {
+        try {
+          const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/bars`);
+          const data = await response.json();
+          setBars(data.bars || []);
+        } catch (error) {
+          console.error('Error fetching bars:', error);
+        }
+      };
+
+      const fetchReviews = async () => {
+        try {
+          const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/reviews`);
+          const data = await response.json();
+          setReviews(data.reviews || []);
+          const rate = data.reviews.reduce((acc, review) => acc + parseFloat(review.rating), 0) / data.reviews.length;
+          const userReview = data.reviews.find(review => review.user_id === currentUser?.id);
+          setUserReview(userReview);
+          setRating(rate);
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        }
+      };
+
+      fetchCurrentUser();
+      fetchBeer();
+      fetchBars();
+      fetchReviews();
+    }, [refresh])  // Add 'refresh' as a dependency
+  );
 
   if (loading) {
     return <ActivityIndicator size="large" color="#AF8F6F" />;
