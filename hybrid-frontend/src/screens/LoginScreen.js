@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
 import { View, Text, TextInput, Button, StyleSheet, Alert, AsyncStorage } from 'react-native';
+import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
 const LoginSchema = yup.object({
   email: yup.string().email('Invalid email').required('The email is necessary to login'),
@@ -19,7 +20,11 @@ const Login = () => {
         initialValues={{ email: '', password: '' }}
         validationSchema={LoginSchema}
         onSubmit={(values, { setSubmitting }) => {
+<<<<<<< HEAD
           fetch('http://localhost:8081/api/v1/login', {
+=======
+          fetch(`http://${IP_BACKEND}:3001/api/v1/login`, {
+>>>>>>> 6d62678ac18c1d2d7e738973fe43b22f8a5def17
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
