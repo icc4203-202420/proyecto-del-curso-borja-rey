@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import BeerLogo from '../../assets/beerLogo.png';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
-export default function BarsScreen() {
+export default function Bars() {
   const [searchTerm, setSearchTerm] = useState('');
   const [bars, setBars] = useState([]);
   const [loading, setLoading] = useState(false);
