@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerLogo from '../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 import { UserContext } from '../context/UserContext';
+import { LinearGradient } from 'expo-linear-gradient'; // Importa LinearGradient desde expo-linear-gradient
 
 function Home({ navigation }) {
   const { currentUser, setCurrentUser } = useContext(UserContext);
@@ -48,7 +49,10 @@ function Home({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['rgba(175, 143, 111, 250)', '#FFFFFF']}
+      style={styles.container}
+    >
       <View style={styles.imageContainer}>
         <Image
           source={BeerLogo}
@@ -76,7 +80,7 @@ function Home({ navigation }) {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </LinearGradient>
   );
 }
 
