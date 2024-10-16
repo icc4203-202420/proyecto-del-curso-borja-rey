@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
 export default function UsersScreen() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,7 +13,7 @@ export default function UsersScreen() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/v1/users');
+      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/users`);
       const data = await response.json();
       
       // Filtrar usuarios según el término de búsqueda

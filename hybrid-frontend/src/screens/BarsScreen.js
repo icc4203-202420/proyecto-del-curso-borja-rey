@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BeerLogo from '../../assets/beerLogo.png';
+import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
 export default function BarsScreen() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,7 +13,7 @@ export default function BarsScreen() {
   const handleSearchBar = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/v1/bars');
+      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/bars`);
       const data = await response.json();
       const filteredBars = data.bars.filter(bar => 
         bar.name.toLowerCase().includes(searchTerm.toLowerCase())
