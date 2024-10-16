@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, I
 import { useNavigation } from '@react-navigation/native';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
-export default function UsersScreen() {
+export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);

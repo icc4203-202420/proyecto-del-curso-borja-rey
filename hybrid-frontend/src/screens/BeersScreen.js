@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import BeerLogo from '../../assets/beerLogo.png';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
-export default function BeersScreen() {
+export default function Beers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [beers, setBeers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function BeersScreen() {
   }, []);
 
   const handleViewClick = (id) => {
-    navigation.navigate('BeerDetails', { id });  // Navegar a la pantalla de detalles de la cerveza
+    navigation.navigate('BeerShow', { id });  // Navegar a la pantalla de detalles de la cerveza
   };
 
   return (
