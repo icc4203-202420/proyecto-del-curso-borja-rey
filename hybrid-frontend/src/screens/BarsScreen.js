@@ -12,7 +12,7 @@ export default function BarsScreen() {
   const handleSearchBar = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8081/api/v1/bars');
+      const response = await fetch('http://${IP_BACKEND}:3001/api/v1/bars');
       const data = await response.json();
       const filteredBars = data.bars.filter(bar => 
         bar.name.toLowerCase().includes(searchTerm.toLowerCase())

@@ -31,12 +31,8 @@ const Signup = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-<<<<<<< HEAD
-        const response = await fetch(`http://localhost:8081/api/v1/countries`);
-=======
         console.log('Fetching countries...'); // Mensaje para depuración
         const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/countries`);
->>>>>>> 6d62678ac18c1d2d7e738973fe43b22f8a5def17
         const data = await response.json();
         console.log('Countries fetched:', data); // Mensaje para depuración
         setCountries(data);
@@ -86,11 +82,7 @@ const Signup = () => {
           const countryId = values.country;
 
           try {
-<<<<<<< HEAD
-            const response = await fetch('http://localhost:8081/api/v1/signup', {
-=======
             const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/signup`, {
->>>>>>> 6d62678ac18c1d2d7e738973fe43b22f8a5def17
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
