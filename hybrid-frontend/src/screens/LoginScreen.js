@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
-import { View, Text, TextInput, Button, StyleSheet, Alert, AsyncStorage } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginSchema = yup.object({
   email: yup.string().email('Invalid email').required('The email is necessary to login'),
