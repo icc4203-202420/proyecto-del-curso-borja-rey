@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { IP_BACKEND } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../context/UserContext';
 
 const LoginSchema = yup.object({
   email: yup.string().email('Invalid email').required('The email is necessary to login'),
@@ -14,6 +15,7 @@ const LoginSchema = yup.object({
 const Login = () => {
   const navigation = useNavigation();
   const [errorMessage, setErrorMessage] = useState('');
+  const { setCurrentUser } = useContext(UserContext);
 
   return (
     <View style={styles.container}>
@@ -31,8 +33,9 @@ const Login = () => {
             .then(response => response.json())
             .then(data => {
               AsyncStorage.setItem('current_user', JSON.stringify(data.status.data.user));
+              setCurrentUser(data.status.data.user);
               setSubmitting(false);
-              navigation.replace('Main'); // Redirige al Main (BottomTabs) en caso de éxito
+              navigation.navigate('Home'); // Redirige al Main (BottomTabs) en caso de éxito
             })
             .catch(error => {
               setErrorMessage('Invalid email or password.');

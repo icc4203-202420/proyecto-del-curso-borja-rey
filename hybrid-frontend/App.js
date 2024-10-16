@@ -4,9 +4,14 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import React from 'react';
 import AppNavigation from './AppNavigation';
+import { UserProvider } from './src/context/UserContext';
 
 export default function App() {
-  return <AppNavigation />;
+  return (
+    <UserProvider>
+      <AppNavigation />
+    </UserProvider>
+  );
 }
 
 const styles = StyleSheet.create({

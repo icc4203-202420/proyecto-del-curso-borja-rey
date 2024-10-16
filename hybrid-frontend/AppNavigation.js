@@ -21,6 +21,7 @@ export default function AppNavigation() {
     const checkUser = async () => {
       const user = await AsyncStorage.getItem('current_user');
       setCurrentUser(user ? JSON.parse(user) : null);
+      console.log('Current user:', user);
       setLoading(false);
     };
     checkUser();

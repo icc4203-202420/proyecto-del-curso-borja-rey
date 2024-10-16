@@ -1,36 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerLogo from '../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
+import { UserContext } from '../context/UserContext';
 
 function Home({ navigation }) {
-  navigation.replace('Home');
-  const [currentUser, setCurrentUser] = useState(null);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user = await AsyncStorage.getItem('current_user');
-        console.log('Current user:', user);
-        if (user !== null) {
-          setCurrentUser(JSON.parse(user));
-        }
-      } catch (error) {
-        console.error('Error fetching current user:', error);
+  const fetchCurrentUser = async () => {
+    try {
+      const user = await AsyncStorage.getItem('current_user');
+      if (user !== null) {
+        setCurrentUser(JSON.parse(user));
       }
-    };
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  };
 
-    fetchCurrentUser();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCurrentUser();
+    }, [])
+  );
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('current_user');
       setCurrentUser(null);
-      navigation.replace('Home');
     } catch (error) {
       console.error('Error logging out:', error);
     }

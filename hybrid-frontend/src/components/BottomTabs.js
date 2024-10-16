@@ -1,13 +1,17 @@
-import React from 'react';
+// src/components/BottomTabs.js
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Beers from '../screens/BeersScreen';
 import Bars from '../screens/BarsScreen';
 import Users from '../screens/UsersScreen';
 import Home from '../screens/HomeScreen';
+import { UserContext } from '../context/UserContext';
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabs({ currentUser }) {
+export default function BottomTabs() {
+  const { currentUser } = useContext(UserContext);
+
   return (
     <Tab.Navigator>
       <Tab.Screen name="Home" component={Home} />
