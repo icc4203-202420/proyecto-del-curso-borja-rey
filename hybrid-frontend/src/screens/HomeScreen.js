@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BeerLogo from '../../assets/beerLogo.png'; // Asegúrate de que la ruta a la imagen sea correcta
 
 function Home({ navigation }) {
+  navigation.replace('Home');
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -16,7 +17,6 @@ function Home({ navigation }) {
         console.log('Current user:', user);
         if (user !== null) {
           setCurrentUser(JSON.parse(user));
-          navigation.replace('Home');
         }
       } catch (error) {
         console.error('Error fetching current user:', error);

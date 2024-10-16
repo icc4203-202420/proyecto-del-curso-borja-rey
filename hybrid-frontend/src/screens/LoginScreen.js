@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { IP_BACKEND } from '@env'; // Importar la variable de entorno
+import { IP_BACKEND } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginSchema = yup.object({
@@ -26,18 +26,15 @@ const Login = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ user: values }), // Enviar los valores de usuario
+            body: JSON.stringify({ user: values }),
           })
-            .then(response => response.json()) // Convertir la respuesta a JSON
+            .then(response => response.json())
             .then(data => {
-              console.log('Logged in successfully:', data);
               AsyncStorage.setItem('current_user', JSON.stringify(data.status.data.user));
-              console.log('Current user:', data.status.data.user);
               setSubmitting(false);
-              navigation.navigate('Home'); // Redirige al home en caso de éxito
+              navigation.replace('Main'); // Redirige al Main (BottomTabs) en caso de éxito
             })
             .catch(error => {
-              console.error('Error logging in:', error);
               setErrorMessage('Invalid email or password.');
               setSubmitting(false);
             });
