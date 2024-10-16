@@ -12,7 +12,7 @@ export default function UsersScreen() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/v1/users');
+      const response = await fetch('http://localhost:8081/api/v1/users');
       const data = await response.json();
       
       // Filtrar usuarios según el término de búsqueda

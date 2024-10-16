@@ -13,7 +13,7 @@ export default function BeersScreen() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/v1/beers');
+      const response = await fetch('http://localhost:8081/api/v1/beers');
       const data = await response.json();
       const filteredBeers = data.beers.filter(beer => 
         beer.name.toLowerCase().includes(searchTerm.toLowerCase())

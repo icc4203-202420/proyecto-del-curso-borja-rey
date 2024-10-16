@@ -19,7 +19,7 @@ const Login = () => {
         initialValues={{ email: '', password: '' }}
         validationSchema={LoginSchema}
         onSubmit={(values, { setSubmitting }) => {
-          fetch('http://localhost:3001/api/v1/login', {
+          fetch('http://localhost:8081/api/v1/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

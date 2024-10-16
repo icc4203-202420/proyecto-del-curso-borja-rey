@@ -17,7 +17,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'http://localhost:3000', 'http://localhost:8081', 'http://192.168.1.91', 'https://um_ry1s-anonymous-8081.exp.direct/' # Reemplaza con la IP de tu iPhone
+    origins 'http://localhost:3000', 'http://localhost:8081', 'http://192.168.1.91/24' # Reemplaza con la IP de tu iPhone
     resource '*',
              headers: :any,
              methods: [:get, :post, :put, :patch, :delete, :options, :head],
