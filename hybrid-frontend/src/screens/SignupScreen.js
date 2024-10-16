@@ -4,6 +4,7 @@ import { Formik, Field } from 'formik';
 import * as yup from 'yup';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, AsyncStorage } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { IP_BACKEND } from '@env'; // Importar la variable de entorno
 
 const SignupSchema = yup.object({
   first_name: yup.string().required('The first name is necessary to signup'),
@@ -29,8 +30,10 @@ const Signup = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch(`http://192.168.1.20:3001/api/v1/countries`);
+        console.log('Fetching countries...'); // Mensaje para depuración
+        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/countries`);
         const data = await response.json();
+        console.log('Countries fetched:', data); // Mensaje para depuración
         setCountries(data);
       } catch (error) {
         console.error('Error fetching countries:', error);
@@ -58,6 +61,7 @@ const Signup = () => {
         }}
         validationSchema={SignupSchema}
         onSubmit={async (values, { setSubmitting }) => {
+          console.log('Form values:', values); // Mensaje para depuración
           const userValues = {
             first_name: values.first_name,
             last_name: values.last_name,
@@ -77,7 +81,7 @@ const Signup = () => {
           const countryId = values.country;
 
           try {
-            const response = await fetch(`http://192.168.1.20:3001/api/v1/signup`, {
+            const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/signup`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -86,12 +90,12 @@ const Signup = () => {
             });
 
             const data = await response.json();
-            console.log('Signed up successfully:', data);
+            console.log('Signed up successfully:', data); // Mensaje para depuración
             console.log("Nuevo usuario creado con id:", data.data.id);
             const userId = data.data.id;
 
             if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
-              const addressResponse = await fetch(`http://192.168.1.20:3001/api/v1/addresses`, {
+              const addressResponse = await fetch(`http://${IP_BACKEND}:3001/api/v1/addresses`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -102,7 +106,7 @@ const Signup = () => {
               });
 
               const addressData = await addressResponse.json();
-              console.log('Address created successfully:', addressData);
+              console.log('Address created successfully:', addressData); // Mensaje para depuración
               AsyncStorage.setItem('current_user', JSON.stringify(data.data));
               setSubmitting(false);
               navigation.navigate('Home');
