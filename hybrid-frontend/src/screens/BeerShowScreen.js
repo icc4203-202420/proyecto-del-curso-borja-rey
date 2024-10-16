@@ -1,28 +1,54 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Añadir useCallback
-import { View, Text, Image, Button, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useCallback, useContext, useReducer } from 'react';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'; // Añadir useFocusEffect
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { IP_BACKEND } from '@env';
+import { UserContext } from '../context/UserContext';
+
+const initialState = {
+  reviews: [],
+  rating: 0,
+  userReview: null,
+  loading: true,
+  error: null,
+};
+
+function reviewsReducer(state, action) {
+  switch (action.type) {
+    case 'FETCH_REVIEWS_SUCCESS':
+      const rate = action.payload.reviews.reduce((acc, review) => acc + parseFloat(review.rating), 0) / action.payload.reviews.length;
+      const userReview = action.payload.reviews.find(review => review.user_id === action.payload.currentUser?.id);
+      return {
+        ...state,
+        reviews: action.payload.reviews,
+        rating: rate,
+        userReview: userReview,
+        loading: false,
+      };
+    case 'FETCH_REVIEWS_ERROR':
+      return {
+        ...state,
+        error: action.payload,
+        loading: false,
+      };
+    default:
+      return state;
+  }
+}
 
 function BeerShow() {
   const route = useRoute();
   const { id, refresh } = route.params;
   const [beer, setBeer] = useState(null);
   const [bars, setBars] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [rating, setRating] = useState(0);
-  const [userReview, setUserReview] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  const { currentUser } = useContext(UserContext); // Obtén currentUser desde UserContext
+
+  const [state, dispatch] = useReducer(reviewsReducer, initialState);
+  const { reviews, rating, userReview, loading, error } = state;
 
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      const user = await AsyncStorage.getItem('current_user');
-      setCurrentUser(JSON.parse(user));
-    };
-
     const fetchBeer = async () => {
       try {
         const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}`);
@@ -47,22 +73,17 @@ function BeerShow() {
       try {
         const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/reviews`);
         const data = await response.json();
-        setReviews(data.reviews || []);
-        const rate = data.reviews.reduce((acc, review) => acc + parseFloat(review.rating), 0) / data.reviews.length;
-        const userReview = data.reviews.find(review => review.user_id === currentUser?.id);
-        setUserReview(userReview);
-        setRating(rate);
+        dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: data.reviews || [], currentUser } });
       } catch (error) {
+        dispatch({ type: 'FETCH_REVIEWS_ERROR', payload: error });
         console.error('Error fetching reviews:', error);
       }
     };
 
-    fetchCurrentUser();
     fetchBeer();
     fetchBars();
     fetchReviews();
-    setLoading(false);
-  }, [id]);
+  }, [id, currentUser]);
 
   const handleViewBarClick = (id) => {
     navigation.navigate('BarDetails', { id });
@@ -75,11 +96,6 @@ function BeerShow() {
 
   useFocusEffect(
     useCallback(() => {
-      const fetchCurrentUser = async () => {
-        const user = await AsyncStorage.getItem('current_user');
-        setCurrentUser(JSON.parse(user));
-      };
-
       const fetchBeer = async () => {
         try {
           const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}`);
@@ -104,21 +120,17 @@ function BeerShow() {
         try {
           const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/reviews`);
           const data = await response.json();
-          setReviews(data.reviews || []);
-          const rate = data.reviews.reduce((acc, review) => acc + parseFloat(review.rating), 0) / data.reviews.length;
-          const userReview = data.reviews.find(review => review.user_id === currentUser?.id);
-          setUserReview(userReview);
-          setRating(rate);
+          dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: data.reviews || [], currentUser } });
         } catch (error) {
+          dispatch({ type: 'FETCH_REVIEWS_ERROR', payload: error });
           console.error('Error fetching reviews:', error);
         }
       };
 
-      fetchCurrentUser();
       fetchBeer();
       fetchBars();
       fetchReviews();
-    }, [refresh])  // Add 'refresh' as a dependency
+    }, [refresh, currentUser])
   );
 
   if (loading) {
@@ -131,11 +143,15 @@ function BeerShow() {
 
   return (
     currentUser ? (
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false} // Oculta el indicador de scroll
+        nestedScrollEnabled={true} // Permite scroll anidado si hay otro scroll
+      >
         <View style={styles.paper}>
           <View style={styles.box}>
             <Text style={styles.title}>{beer.name}</Text>
-            <Text style={styles.subtitle}>{beer.brewery || 'N/A'} | Rating: {rating.toFixed(2)}</Text>
+            <Text style={styles.subtitle}>Brewery: {beer.brewery || 'N/A'} | Rating: {rating.toFixed(2)}</Text>
           </View>
           <View style={styles.imageContainer}>
             <Image
@@ -164,7 +180,7 @@ function BeerShow() {
             <View style={styles.box}>
               <Text style={styles.title}>Your Review</Text>
               <View style={styles.reviewBox}>
-                <Text style={styles.reviewText}>Rate: {userReview.rating}; {userReview.text}</Text>
+                <Text style={styles.reviewText}>Rate: {userReview.rating} - {userReview.text}</Text>
               </View>
             </View>
           </View>
@@ -177,7 +193,7 @@ function BeerShow() {
               bars.map(bar => (
                 <View key={bar.id} style={styles.barBox}>
                   <Text style={styles.barText}>{bar.name}</Text>
-                  <TouchableOpacity style={styles.button} onPress={() => handleViewBarClick(bar.id)}>
+                  <TouchableOpacity style={styles.buttonViewBar} onPress={() => handleViewBarClick(bar.id)}>
                     <Text style={styles.buttonText}>View</Text>
                   </TouchableOpacity>
                 </View>
@@ -194,7 +210,7 @@ function BeerShow() {
             {reviews.length > 0 ? (
               reviews.map((review, i) => (
                 <View key={review.id} style={styles.reviewBox}>
-                  <Text style={styles.reviewText}>{i + 1}. Rate: {review.rating}; {review.text}</Text>
+                  <Text style={styles.reviewText}>{i + 1}. Rate: {review.rating} - {review.text}</Text>
                 </View>
               ))
             ) : (
@@ -222,14 +238,13 @@ function BeerShow() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+  scrollContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: '#F8F4E1',
+    flexGrow: 1, // Asegura que el ScrollView crezca si hay más contenido
   },
   paper: {
-    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 4,
     padding: 16,
@@ -273,6 +288,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginHorizontal: 4,
+  },
+  buttonViewBar: {
+    backgroundColor: '#AF8F6F',
+    padding: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    alignSelf: 'flex-end', // Alinea el botón a la derecha
+    width: 'auto', // Permite que el ancho se ajuste automáticamente al contenido
   },
   buttonText: {
     color: 'white',

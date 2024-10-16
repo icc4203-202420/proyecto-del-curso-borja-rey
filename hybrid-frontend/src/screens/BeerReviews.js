@@ -105,6 +105,7 @@ const BeerReviews = () => {
             {touched.text && errors.text && <Text style={styles.errorText}>{errors.text}</Text>}
             <Button
               title="Submit Review"
+              fontFamily="Belwe"
               onPress={handleSubmit}
               disabled={isSubmitting}
               color="#AF8F6F"
