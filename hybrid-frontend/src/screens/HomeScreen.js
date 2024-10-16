@@ -13,8 +13,10 @@ function Home({ navigation }) {
     const fetchCurrentUser = async () => {
       try {
         const user = await AsyncStorage.getItem('current_user');
+        console.log('Current user:', user);
         if (user !== null) {
           setCurrentUser(JSON.parse(user));
+          navigation.replace('Home');
         }
       } catch (error) {
         console.error('Error fetching current user:', error);
@@ -24,9 +26,14 @@ function Home({ navigation }) {
     fetchCurrentUser();
   }, []);
 
-  const handleSearch = () => {
-    // Lógica de búsqueda aquí
-    console.log('Buscando:', searchQuery);
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('current_user');
+      setCurrentUser(null);
+      navigation.replace('Home');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   const handleLogin = () => {
@@ -53,17 +60,11 @@ function Home({ navigation }) {
       </View>
       {currentUser ? (
         <>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.buttonText}>Search</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.mapButton} onPress={handleOpenMap}>
             <Text style={styles.buttonText}>Open Map</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.searchButton} onPress={handleLogout}>
+            <Text style={styles.buttonText}>Log out</Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#AF8F6F',
     padding: 12,
     borderRadius: 4,
-    marginBottom: 16,
+    marginTop: 16,
     width: '100%',
     alignItems: 'center',
   },

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, AsyncStorage } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignupSchema = yup.object({
   first_name: yup.string().required('The first name is necessary to signup'),
@@ -92,7 +93,9 @@ const Signup = () => {
             const data = await response.json();
             console.log('Signed up successfully:', data); // Mensaje para depuración
             console.log("Nuevo usuario creado con id:", data.data.id);
+            console.log("hola")
             const userId = data.data.id;
+            console.log("chao")
 
             if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
               const addressResponse = await fetch(`http://${IP_BACKEND}:3001/api/v1/addresses`, {
@@ -107,12 +110,18 @@ const Signup = () => {
 
               const addressData = await addressResponse.json();
               console.log('Address created successfully:', addressData); // Mensaje para depuración
+              console.log("a")
               AsyncStorage.setItem('current_user', JSON.stringify(data.data));
+              console.log("1")
               setSubmitting(false);
+              console.log("2");
               navigation.navigate('Home');
             } else {
+              console.log("b")
               AsyncStorage.setItem('current_user', JSON.stringify(data.data));
+              console.log("3")
               setSubmitting(false);
+              console.log("4");
               navigation.navigate('Home');
             }
           } catch (error) {
@@ -122,7 +131,9 @@ const Signup = () => {
               console.error('Error signing up:', error);
               setErrorMessage('Error Signing up. Please try again.');
             }
-            setSubmitting(false);
+            console.log("5")
+              setSubmitting(false);
+              console.log("6");
           }
         }}
       >
