@@ -63,6 +63,8 @@ export default function Beers() {
               <Text style={styles.beerDetails}>
                 {item.style} - {item.alcohol} - {item.ibu}
               </Text>
+              <Text style={styles.beerDetails}>Malts: {item.malts} | Hop: {item.hop}</Text>
+              <Text style={styles.beerDetails}>Yeast: {item.yeast}</Text>
               <TouchableOpacity
                 style={styles.viewButton}
                 onPress={() => handleViewClick(item.id)}
@@ -148,6 +150,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   viewButtonText: {
     color: '#fff',

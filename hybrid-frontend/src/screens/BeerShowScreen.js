@@ -41,6 +41,7 @@ function BeerShow() {
   const { id, refresh } = route.params;
   const [beer, setBeer] = useState(null);
   const [bars, setBars] = useState([]);
+  const [breweries, setBreweries] = useState([]);
   const { currentUser } = useContext(UserContext); // Obtén currentUser desde UserContext
 
   const [state, dispatch] = useReducer(reviewsReducer, initialState);
@@ -69,6 +70,16 @@ function BeerShow() {
       }
     };
 
+    const fetchBreweries = async () => {
+      try {
+        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/breweries`);
+        const data = await response.json();
+        setBreweries(data.breweries || []);
+      } catch (error) {
+        console.error('Error fetching bars:', error);
+      }
+    };
+
     const fetchReviews = async () => {
       try {
         const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/reviews`);
@@ -82,6 +93,7 @@ function BeerShow() {
 
     fetchBeer();
     fetchBars();
+    fetchBreweries();
     fetchReviews();
   }, [id, currentUser]);
 
@@ -144,10 +156,10 @@ function BeerShow() {
   return (
     currentUser ? (
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false} // Oculta el indicador de scroll
-        nestedScrollEnabled={true} // Permite scroll anidado si hay otro scroll
-      >
+          style={{ flex: 1 }} // Asegura que el ScrollView ocupe todo el espacio disponible
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={true}
+        >
         <View style={styles.paper}>
           <View style={styles.box}>
             <Text style={styles.title}>{beer.name}</Text>
@@ -163,7 +175,6 @@ function BeerShow() {
             <Text style={styles.description}>{beer.description || 'No description available.'}</Text>
             <Text style={styles.description}>Alcohol: {beer.alcohol} | IBU: {beer.ibu}</Text>
             <Text style={styles.description}>Malts: {beer.malts} | Hop: {beer.hop} | Yeast: {beer.yeast}</Text>
-            <Text style={styles.description}>Brand: {beer.brand.name} | Brewery: {beer.brand.brewery.name}</Text>
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={() => console.log('Favorite clicked')}>
@@ -206,6 +217,21 @@ function BeerShow() {
 
         <View style={styles.paper}>
           <View style={styles.box}>
+            <Text style={styles.title}>Breweries</Text>
+            {breweries.length > 0 ? (
+              breweries.map(brewery => (
+                <View key={brewery.id} style={styles.barBox}>
+                  <Text style={styles.barText}>{brewery.name}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.message}>No breweries found.</Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.paper}>
+          <View style={styles.box}>
             <Text style={styles.title}>Reviews</Text>
             {reviews.length > 0 ? (
               reviews.map((review, i) => (
@@ -217,12 +243,6 @@ function BeerShow() {
               <Text style={styles.message}>No reviews found.</Text>
             )}
           </View>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => handleViewReviewsClick(beer.id)}>
-            <Text style={styles.buttonText}>Add a Review</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     ) : (
@@ -238,9 +258,9 @@ function BeerShow() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+  container: {
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     backgroundColor: '#F8F4E1',
     flexGrow: 1, // Asegura que el ScrollView crezca si hay más contenido
   },
@@ -253,6 +273,7 @@ const styles = StyleSheet.create({
   },
   box: {
     padding: 8,
+    marginBottom:1,
   },
   title: {
     fontSize: 24,
@@ -307,6 +328,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 4,
+    marginBottom: 5,
   },
   reviewText: {
     fontSize: 14,
