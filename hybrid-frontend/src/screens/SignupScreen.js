@@ -106,9 +106,9 @@ const Signup = () => {
                 }),
               });
 
-              const addressData = await addressResponse.json();
               AsyncStorage.setItem('current_user', JSON.stringify(data.data));
-              setCurrentUser(data.status.data.user);
+              console.log("Data: ", data.data);
+              setCurrentUser(data.data);
               setSubmitting(false);
               navigation.navigate('Home');
             } else {
@@ -122,7 +122,7 @@ const Signup = () => {
               setErrorMessage('There is already a user with this email or handle.');
             } else {
               console.error('Error signing up:', error);
-              setErrorMessage('Error Signing up. Please try again.');
+              setErrorMessage('There is already a user with this email or handle.');
             }
               setSubmitting(false);
           }
