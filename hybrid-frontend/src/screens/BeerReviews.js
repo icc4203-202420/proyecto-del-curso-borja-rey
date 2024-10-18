@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native'; // Importar TouchableOpacity
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import Slider from '@react-native-community/slider';
@@ -135,10 +135,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F4E1', // Usar el mismo color de fondo que BeersScreen
   },
   formContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', // Fondo blanco para el formulario
     borderRadius: 4,
     padding: 16,
     marginBottom: 16,
@@ -169,6 +169,17 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginVertical: 8,
+  },
+  submitButton: {
+    backgroundColor: '#d7b49e', // Usar el mismo color que el botón de búsqueda en BeersScreen
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

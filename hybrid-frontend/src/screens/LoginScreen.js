@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native'; // Importar TouchableOpacity
 import { IP_BACKEND } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../context/UserContext';
@@ -65,7 +65,9 @@ const Login = () => {
               />
             </View>
             {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
-            <Button onPress={handleSubmit} title="Submit" disabled={isSubmitting} />
+            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={isSubmitting}>
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
           </View>
         )}
       </Formik>
@@ -95,18 +97,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F4E1', // Usar el mismo color de fondo que BeersScreen
   },
   formContainer: {
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
+    backgroundColor: '#fff', // Fondo blanco para el formulario
+    padding: 20,
+    borderRadius: 5,
+    elevation: 3,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: "Belwe",
   },
   inputContainer: {
     marginBottom: 16,
@@ -126,6 +133,18 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginBottom: 16,
+  },
+  submitButton: {
+    backgroundColor: '#AF8F6F', // Usar el mismo color que el botón de búsqueda en BeersScreen
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontFamily: "Belwe",
   },
 });
 
