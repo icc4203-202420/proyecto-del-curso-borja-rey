@@ -63,9 +63,8 @@ export default function Beers() {
               <Text style={styles.beerDetails}>
                 {item.style} - {item.alcohol} - {item.ibu}
               </Text>
-              <Text style={styles.beerIngredients}>
-                Malts: {item.malts} | Hop: {item.hop} | Yeast: {item.yeast}
-              </Text>
+              <Text style={styles.beerDetails}>Malts: {item.malts} | Hop: {item.hop}</Text>
+              <Text style={styles.beerDetails}>Yeast: {item.yeast}</Text>
               <TouchableOpacity
                 style={styles.viewButton}
                 onPress={() => handleViewClick(item.id)}
@@ -97,6 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    fontFamily: 'Belwe',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     marginLeft: 10,
-    backgroundColor: '#d7b49e',
+    backgroundColor: '#AF8F6F',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   searchButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
   listItem: {
     backgroundColor: '#fff',
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
   beerName: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
   beerDetails: {
     fontSize: 14,
@@ -144,13 +146,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   viewButton: {
-    backgroundColor: '#d7b49e',
+    backgroundColor: '#AF8F6F',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   viewButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
 });

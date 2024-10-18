@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     marginTop: 16,
+    fontFamily: 'Belwe',
   },
   searchInput: {
     width: '100%',
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
 });
 

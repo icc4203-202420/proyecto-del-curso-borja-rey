@@ -66,6 +66,16 @@ class API::V1::BeersController < ApplicationController
     end
   end
 
+  def breweries
+    @beer = Beer.find_by(id: params[:id])
+    if @beer
+      @breweries = @beer.breweries
+      render json: { breweries: @breweries }, status: :ok
+    else
+      render json: { error: 'Beer not found' }, status: :not_found
+    end
+  end
+
   def reviews
     @beer = Beer.find_by(id: params[:id])
     if @beer

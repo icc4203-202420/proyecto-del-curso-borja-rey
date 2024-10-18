@@ -31,6 +31,7 @@ Rails.application.routes.draw do
       resources :beers do
         member do
           get 'bars', to: 'beers#bars'
+          get 'breweries', to: 'beers#breweries'
           get 'reviews', to: 'beers#reviews'
         end
       end

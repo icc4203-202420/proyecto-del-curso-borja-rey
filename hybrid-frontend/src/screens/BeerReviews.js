@@ -103,9 +103,13 @@ const BeerReviews = () => {
               style={styles.textInput}
             />
             {touched.text && errors.text && <Text style={styles.errorText}>{errors.text}</Text>}
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={isSubmitting}>
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </TouchableOpacity>
+            <Button
+              title="Submit Review"
+              fontFamily="Belwe"
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+              color="#AF8F6F"
+            />
             {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
           </View>
         )}

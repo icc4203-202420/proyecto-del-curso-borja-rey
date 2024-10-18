@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    fontFamily: 'Belwe',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     marginLeft: 10,
-    backgroundColor: '#d7b49e',
+    backgroundColor: '#AF8F6F',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -124,6 +125,7 @@ const styles = StyleSheet.create({
   searchButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
   listItem: {
     backgroundColor: '#fff',
@@ -135,6 +137,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
   userDetails: {
     fontSize: 14,
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   viewButton: {
-    backgroundColor: '#d7b49e',
+    backgroundColor: '#AF8F6F',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -150,5 +153,6 @@ const styles = StyleSheet.create({
   viewButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Belwe',
   },
 });
