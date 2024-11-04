@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { IP_BACKEND } from '@env';
@@ -15,13 +15,13 @@ const EventPictureSchema = yup.object({
 
 const CreatePicture = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { eventId } = route.params;
   const [errorMessage, setErrorMessage] = useState('');
   const [previewUri, setPreviewUri] = useState(null);
   const { currentUser } = useContext(UserContext);
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    const eventId = parseInt(localStorage.getItem("event"));
-
     try {
       const response = await fetch(values.image);
       const blob = await response.blob();
