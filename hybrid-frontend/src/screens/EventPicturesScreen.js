@@ -12,7 +12,7 @@ function EventPictures() {
   const navigation = useNavigation();
 
   const handleViewPictureClick = (pictureId) => {
-    navigation.navigate('EventPictureDetails', { id: pictureId });
+    navigation.navigate('PictureShow', { id: pictureId });
   };
 
   useEffect(() => {

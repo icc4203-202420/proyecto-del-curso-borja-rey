@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, PixelRatio, Button } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
-import { useVideoPlayer, VideoView } from 'expo-video';
 
-const EventShowScreen = () => {
+const EventShow = () => {
   const route = useRoute();
   const { id } = route.params;
   const [event, setEvent] = useState(null);
@@ -169,15 +168,18 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#AF8F6F',
-    padding: 12,
+    paddingVertical: 4, // Ajusta el padding vertical para hacer los botones más pequeños
+    paddingHorizontal: 8, // Ajusta el padding horizontal para hacer los botones más pequeños
     borderRadius: 4,
     alignItems: 'center',
     flex: 1,
     marginHorizontal: 4,
+    height: 32, // Ajusta la altura del botón
   },
   buttonText: {
     color: 'white',
     fontFamily: 'Belwe',
+    fontSize: 12, // Ajusta el tamaño de la fuente para hacer el texto más pequeño
   },
   attendanceBox: {
     padding: 8,
@@ -197,4 +199,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventShowScreen;
+export default EventShow;
