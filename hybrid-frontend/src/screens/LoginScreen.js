@@ -34,6 +34,7 @@ const Login = () => {
             .then(data => {
               AsyncStorage.setItem('current_user', JSON.stringify(data.status.data.user));
               setCurrentUser(data.status.data.user);
+              console.log("data: ", data.headers);
               setSubmitting(false);
               navigation.navigate('Home'); // Redirige al Main (BottomTabs) en caso de éxito
             })

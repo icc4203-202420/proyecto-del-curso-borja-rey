@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import Login from './src/screens/LoginScreen';
 import Signup from './src/screens/SignupScreen';
 import Beers from './src/screens/BeersScreen';
@@ -10,12 +11,23 @@ import Users from './src/screens/UsersScreen';
 import BeerShow from './src/screens/BeerShowScreen';
 import BeerReviews from './src/screens/BeerReviews';
 import BottomTabs from './src/components/BottomTabs';  // Mover Bottom Tabs a un componente separado
+import UserShow from './src/screens/UserShowScreen';
 
 const Stack = createStackNavigator();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function AppNavigation() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -25,7 +37,39 @@ export default function AppNavigation() {
       setLoading(false);
     };
     checkUser();
+
+    registerForPushNotificationsAsync();
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification received:', notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notification response received:', response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
+
+  const registerForPushNotificationsAsync = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log('Expo Push Token:', token);
+    await AsyncStorage.setItem('expo_push_token', token); // Guarda el token en AsyncStorage
+    return token;
+  };
 
   if (loading) return null;
 
@@ -45,6 +89,7 @@ export default function AppNavigation() {
         <Stack.Screen name="Users" component={Users} />
         <Stack.Screen name="BeerShow" component={BeerShow} />
         <Stack.Screen name="BeerReviews" component={BeerReviews} />
+        <Stack.Screen name="UserShow" component={UserShow} />
       </Stack.Navigator>
     </NavigationContainer>
   );

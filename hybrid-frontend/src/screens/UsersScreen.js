@@ -32,7 +32,7 @@ export default function Users() {
   }, []);
 
   const handleViewClick = (id) => {
-    navigation.navigate('UserDetails', { id });  // Navegar a la pantalla de detalles del usuario
+    navigation.navigate('UserShow', { id });  // Navegar a la pantalla de detalles del usuario
   };
 
   return (
