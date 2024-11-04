@@ -26,6 +26,8 @@ Rails.application.routes.draw do
         member do
           get 'attendances', to: 'events#attendances'
           get 'event_pictures', to: 'events#event_pictures'
+          get 'video_exists', to: 'events#video_exists'
+          post 'create_video', to: 'events#create_video' 
         end
       end
       resources :beers do

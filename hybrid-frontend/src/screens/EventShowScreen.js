@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, PixelRatio, Button } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, Button } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { Video } from 'expo-av';
 
 const EventShowScreen = () => {
   const route = useRoute();
@@ -12,6 +12,8 @@ const EventShowScreen = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [attendances, setAttendances] = useState([]);
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
 
@@ -75,6 +77,25 @@ const EventShowScreen = () => {
     navigation.navigate('CreatePicture', { eventId });
   };
 
+  const handleResumeClick = async (eventId) => {
+    try {
+      const response = await axios.get(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/video_exists`);
+      if (response.data.video_exists) {
+        setVideoUrl(response.data.video_url);
+        setModalVisible(true);
+      } else {
+        const videoResponse = await axios.post(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/create_video`);
+        console.log('Creating video...', videoResponse.data);
+        if (response.data.video_created) {
+          setVideoUrl(response.data.video_url);
+          setModalVisible(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling resume click:', error);
+    }
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#AF8F6F" />;
   }
@@ -111,7 +132,7 @@ const EventShowScreen = () => {
         </View>
         {new Date() > new Date(event.date) && (
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => handlePostPictureClick(event.id)}>
+            <TouchableOpacity style={styles.button} onPress={() => handleResumeClick(event.id)}>
               <Text style={styles.buttonText}>Resume</Text>
             </TouchableOpacity>
           </View>
@@ -132,6 +153,29 @@ const EventShowScreen = () => {
           )}
         </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
+          <Video
+            source={{ uri: videoUrl }}
+            rate={1.0}
+            volume={1.0}
+            isMuted={false}
+            resizeMode="cover"
+            shouldPlay
+            useNativeControls
+            style={styles.video}
+          />
+          <Button title="Close" onPress={() => setModalVisible(false)} />
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -194,6 +238,16 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginVertical: 16,
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  video: {
+    width: '100%',
+    height: 300,
   },
 });
 
