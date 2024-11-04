@@ -10,6 +10,11 @@ import Bars from './src/screens/BarsScreen';
 import Users from './src/screens/UsersScreen';
 import BeerShow from './src/screens/BeerShowScreen';
 import BeerReviews from './src/screens/BeerReviews';
+import CreatePicture from './src/screens/CreatePicture';
+import EventPictures from './src/screens/EventPicturesScreen';
+import EventShow from './src/screens/EventShowScreen';
+import BarShow from './src/screens/BarShowScreen';
+
 import BottomTabs from './src/components/BottomTabs';  // Mover Bottom Tabs a un componente separado
 import UserShow from './src/screens/UserShowScreen';
 
@@ -90,6 +95,10 @@ export default function AppNavigation() {
         <Stack.Screen name="BeerShow" component={BeerShow} />
         <Stack.Screen name="BeerReviews" component={BeerReviews} />
         <Stack.Screen name="UserShow" component={UserShow} />
+        <Stack.Screen name="CreatePicture" component={CreatePicture} />
+        <Stack.Screen name="EventPictures" component={EventPictures} />
+        <Stack.Screen name="EventShow" component={EventShow} />
+        <Stack.Screen name="BarShow" component={BarShow} />
       </Stack.Navigator>
     </NavigationContainer>
   );

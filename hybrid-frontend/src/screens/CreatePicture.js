@@ -13,7 +13,7 @@ const EventPictureSchema = yup.object({
   image: yup.mixed().required('Image is required')
 });
 
-const CreatePictureScreen = () => {
+const CreatePicture = () => {
   const navigation = useNavigation();
   const [errorMessage, setErrorMessage] = useState('');
   const [previewUri, setPreviewUri] = useState(null);
@@ -209,4 +209,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePictureScreen;
+export default CreatePicture;
