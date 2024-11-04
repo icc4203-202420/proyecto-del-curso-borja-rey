@@ -52,7 +52,6 @@ Rails.application.routes.draw do
       resources :addresses
       resources :countries
       resources :reviews
-      resources :event_pictures
     end
   end
 end

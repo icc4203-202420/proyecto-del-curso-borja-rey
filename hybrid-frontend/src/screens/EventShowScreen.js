@@ -213,18 +213,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#AF8F6F',
-    paddingVertical: 4, // Ajusta el padding vertical para hacer los botones más pequeños
-    paddingHorizontal: 8, // Ajusta el padding horizontal para hacer los botones más pequeños
+    padding: 12,
     borderRadius: 4,
     alignItems: 'center',
     flex: 1,
     marginHorizontal: 4,
-    height: 32, // Ajusta la altura del botón
   },
   buttonText: {
     color: 'white',
     fontFamily: 'Belwe',
-    fontSize: 12, // Ajusta el tamaño de la fuente para hacer el texto más pequeño
   },
   attendanceBox: {
     padding: 8,

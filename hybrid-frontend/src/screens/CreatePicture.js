@@ -111,6 +111,7 @@ const CreatePicture = () => {
             <TextInput
               style={styles.input}
               placeholder="Description *"
+              placeholderTextColor="rgba(0, 0, 0, 0.6)" // Cambia la opacidad del texto del placeholder
               onChangeText={handleChange('description')}
               onBlur={handleBlur('description')}
               value={values.description}

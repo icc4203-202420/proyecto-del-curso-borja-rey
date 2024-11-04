@@ -1,3 +1,6 @@
+require 'open-uri'
+require 'tempfile'
+
 class API::V1::EventsController < ApplicationController
   include ImageProcessing
   include Authenticable
@@ -91,20 +94,26 @@ class API::V1::EventsController < ApplicationController
   end
 
   def create_video
-    @event_pictures = EventPicture.where(event_id: params[:event_id])
+    @event_pictures = EventPicture.where(event_id: params[:id])
     @picture_urls = @event_pictures.map { |picture| url_for(picture.picture) }
-    if @event_pictures.empty?
+  
+    if @picture_urls.empty?
       render json: { video_created: false, message: 'No pictures found for this event.' }
-    else
-      Dir.mktmpdir do |dir|
-        download_images(@picture_urls, dir)
-        video_path = create_video_from_images(dir)
+      return
+    end
+  
+    puts "-------!!!!----!!!!---!!!---Creating video..."
+    Dir.mktmpdir do |dir|
+      video_path = create_video_from_images(@picture_urls, dir)
+      if File.exist?(video_path)
         send_file video_path, type: 'video/mp4', disposition: 'attachment'
         File.delete(video_path) if File.exist?(video_path)
+      else
+        render json: { video_created: false, message: 'Video creation failed.' }
       end
-      render json: { video_created: true, message: 'Creando video' }
     end
   end
+  
 
   def video_exists
     video_path = Rails.root.join('public', 'videos', "event_#{params[:event_id]}.mp4")
@@ -150,19 +159,36 @@ class API::V1::EventsController < ApplicationController
     { io: io, filename: "upload.jpg", content_type: "image/jpeg" }
   end
 
-  def download_images(picture_urls, dir)
+  def create_video_from_images(picture_urls, dir)
+    image_files = []
+  
     picture_urls.each_with_index do |url, index|
-      open(url) do |image|
-        File.open("#{dir}/image#{index}.jpg", "wb") do |file|
-          file.write(image.read)
-        end
+      begin
+        file = Tempfile.new(["image#{index}", '.jpg'], dir)
+        file.binmode
+        file.write(URI.open(url).read)
+        file.rewind
+        image_files << file
+      rescue => e
+        puts "Error downloading image #{url}: #{e.message}"
       end
     end
-  end
-
-  def create_video_from_images(dir)
+  
     video_path = Rails.root.join('public', 'videos', "event_#{params[:event_id]}.mp4")
-    system("ffmpeg -framerate 1/3 -pattern_type glob -i '#{dir}/*.jpg' -c:v libx264 #{video_path}")
+  
+    if image_files.any?
+      # Construye el video usando ffmpeg
+      image_files_paths = image_files.map(&:path).join('|')
+      system("ffmpeg -framerate 1/3 -pattern_type glob -i '#{image_files_paths}' -c:v libx264 #{video_path}")
+  
+      image_files.each(&:close)
+      image_files.each(&:unlink)
+    else
+      puts "No images available to create video"
+      return nil
+    end
+  
     video_path
   end
+  
 end
