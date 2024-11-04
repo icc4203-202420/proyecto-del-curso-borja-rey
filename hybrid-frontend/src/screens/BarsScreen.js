@@ -30,7 +30,7 @@ export default function Bars() {
   }, []);
 
   const handleViewClick = (id) => {
-    navigation.navigate('BarDetails', { id });  // Navegar a la pantalla de detalles de un bar
+    navigation.navigate('BarShow', { id });  // Navegar a la pantalla de detalles de un bar
   };
 
   return (
