@@ -15,6 +15,7 @@ const EventShow = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
+  const urlDefinitivo = "https://www.youtube.com/watch?v=mCdA4bJAGGk"
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -193,7 +194,7 @@ const EventShow = () => {
         <View style={styles.modalView}>
           <View style={styles.videoContainer}>
             <Video
-              source={{ uri: videoUrl }}
+              source={{ uri: urlDefinitivo }}
               rate={1.0}
               volume={1.0}
               isMuted={false}

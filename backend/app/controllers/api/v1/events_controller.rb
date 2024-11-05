@@ -112,6 +112,7 @@ class API::V1::EventsController < ApplicationController
 
   def video_exists
     if @event.video.attached?
+      # @event.video.purge
       video_url = url_for(@event.video)  # Genera la URL de Active Storage para el video
       render json: { video_exists: true, video_url: video_url, message: "Video found" }, status: :ok
     else
@@ -135,48 +136,50 @@ class API::V1::EventsController < ApplicationController
     @event.flyer.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
   end
 
-  def create_video_from_active_storage_images(event_pictures, dir)
-    image_files = []
-  
-    event_pictures.each_with_index do |picture, index|
-      begin
-        file_path = File.join(dir, "image#{format('%03d', index)}.jpg")
-        File.open(file_path, 'wb') { |file| file.write(picture.picture.download) }
-        image_files << file_path
-        puts "Image saved to temporary path: #{file_path}"
-      rescue => e
-        puts "Error accessing image for EventPicture ID #{picture.id}: #{e.message}"
-      end
-    end
-  
-    # Genera el video en un archivo temporal
-    video_tempfile = Tempfile.new(["event_video_#{params[:id]}", '.mp4'], binmode: true)
-    video_path = video_tempfile.path
-    puts "Video path set to: #{video_path}"
-  
-    if image_files.any?
-      puts "Starting ffmpeg command..."
-      system("ffmpeg -framerate 1/3 -i '#{dir}/image%03d.jpg' -c:v libx264 -pix_fmt yuv420p #{video_path}")
-  
-      if File.exist?(video_path)
-        puts "Video successfully created at: #{video_path}"
-  
-        # Guarda el video en Active Storage adjuntándolo al evento
-        @event.video.attach(io: File.open(video_path), filename: "event_#{params[:id]}.mp4", content_type: 'video/mp4')
-        puts "Video attached to event with ID #{params[:id]} in Active Storage."
-  
-        # Limpia los archivos temporales de imágenes y el video
-        image_files.each { |path| File.delete(path) if File.exist?(path) }
-        video_tempfile.close
-        video_tempfile.unlink
-      else
-        puts "Failed to create video file."
-      end
-    else
-      puts "No images available to create video"
-      return nil
+def create_video_from_active_storage_images(event_pictures, dir)
+  image_files = []
+
+  # Descarga las imágenes del evento y las guarda en archivos temporales
+  event_pictures.each_with_index do |picture, index|
+    begin
+      file_path = File.join(dir, "image#{format('%03d', index)}.jpg")
+      File.open(file_path, 'wb') { |file| file.write(picture.picture.download) }
+      image_files << file_path
+      puts "Image saved to temporary path: #{file_path}"
+    rescue => e
+      puts "Error accessing image for EventPicture ID #{picture.id}: #{e.message}"
     end
   end
+
+  # Genera el video en un archivo temporal
+  video_tempfile = Tempfile.new(["event_video_#{params[:id]}", '.mp4'], binmode: true)
+  video_path = video_tempfile.path
+  puts "Video path set to: #{video_path}"
+
+  if image_files.any?
+    puts "Starting ffmpeg command..."
+    # Comando optimizado de ffmpeg
+    system("ffmpeg -framerate 1/3 -i '#{dir}/image%03d.jpg' -s 1280x720 -c:v libx264 -pix_fmt yuv420p -movflags +faststart #{video_path}")
+
+    if File.exist?(video_path)
+      puts "Video successfully created at: #{video_path}"
+
+      # Adjunta el video a Active Storage
+      @event.video.attach(io: File.open(video_path), filename: "event_#{params[:id]}.mp4", content_type: 'video/mp4')
+      puts "Video attached to event with ID #{params[:id]} in Active Storage."
+
+      # Limpia los archivos temporales de imágenes y el video
+      image_files.each { |path| File.delete(path) if File.exist?(path) }
+      video_tempfile.close
+      video_tempfile.unlink
+    else
+      puts "Failed to create video file."
+    end
+  else
+    puts "No images available to create video"
+    return nil
+  end
+end
 
   def decode_image(base64_image)
     decoded_data = Base64.decode64(base64_image)
