@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, Button } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, Pressable } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
@@ -103,6 +103,7 @@ const EventShow = () => {
         },
       });
       const data = await response.json();
+      console.log('Checking if video exists...', data);
       if (data.video_exists) {
         setVideoUrl(data.video_url);
         setModalVisible(true);
@@ -116,6 +117,7 @@ const EventShow = () => {
         const videoData = await videoResponse.json();
         console.log('Creating video...', videoData);
         if (videoData.video_created) {
+          console.log('Video created successfully:', videoData.video_url);
           setVideoUrl(videoData.video_url);
           setModalVisible(true);
         }
@@ -132,7 +134,6 @@ const EventShow = () => {
   if (!event) {
     return <Text style={styles.message}>Event not found.</Text>;
   }
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.paper}>
@@ -187,24 +188,28 @@ const EventShow = () => {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <View style={styles.modalView}>
-          <Video
-            source={{ uri: videoUrl }}
-            rate={1.0}
-            volume={1.0}
-            isMuted={false}
-            resizeMode="cover"
-            shouldPlay
-            useNativeControls
-            style={styles.video}
-          />
-          <Button title="Close" onPress={() => setModalVisible(false)} />
+          <View style={styles.videoContainer}>
+            <Video
+              source={{ uri: videoUrl }}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode="contain"  // Ajusta el video sin recortar
+              shouldPlay
+              useNativeControls
+              style={styles.video}
+              onError={(error) => console.log("Error loading video:", error)}
+            />
+          </View>
+          <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
+            <Text style={styles.buttonText}>Close</Text>
+          </Pressable>
         </View>
       </Modal>
+
     </ScrollView>
   );
 };
@@ -274,10 +279,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+  videoContainer: {
+    width: '90%',  // Ajusta el ancho para dejar margen
+    height: 300,
+    backgroundColor: '#fff',  // Marco blanco
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,  // Espacio entre el video y el borde blanco
+    borderRadius: 10,
+  },
   video: {
     width: '100%',
-    height: 300,
+    height: '100%',
   },
 });
+
 
 export default EventShow;

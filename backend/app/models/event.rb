@@ -6,6 +6,7 @@ class Event < ApplicationRecord
   has_many :friendships
 
   has_one_attached :flyer
+  has_one_attached :video
 
   def thumbnail
     flyer.variant(resize_to_limit: [200, 200]).processed
