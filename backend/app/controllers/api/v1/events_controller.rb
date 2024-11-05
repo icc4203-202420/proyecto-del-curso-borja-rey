@@ -25,7 +25,7 @@ class API::V1::EventsController < ApplicationController
     if @event.flyer.attached?
       render json: @event.as_json.merge({
         image_url: url_for(@event.flyer),
-        thumbnail_url: url_for(@event.thumbnail),
+        thumbnail_url: url_for(@event.flyer.variant(resize: "100x100")),
         bar_name: @event.bar.name
       }), status: :ok
     else
@@ -66,7 +66,7 @@ class API::V1::EventsController < ApplicationController
 
   def attendances
     @event = Event.find(params[:id])
-    @attendances = @event.attendances.includes(:user)  # Incluir la relación con los usuarios
+    @attendances = @event.attendances.includes(:user)
 
     render json: {
       attendances: @attendances.map { |attendance|
@@ -76,7 +76,6 @@ class API::V1::EventsController < ApplicationController
             name: attendance.user.handle,
             first_name: attendance.user.first_name,
             last_name: attendance.user.last_name
-            # Agrega otros atributos del usuario que quieras incluir
           }
         })
       }
@@ -87,21 +86,21 @@ class API::V1::EventsController < ApplicationController
     @event_pictures = @event.event_pictures
     render json: {
       pictures: @event_pictures.map { |picture|
-      puts "Picture ID: #{picture.id}"
-      picture.as_json.merge(picture_id: picture.id, picture_url: url_for(picture.picture))
-    }
+        puts "Picture ID: #{picture.id}"
+        picture.as_json.merge(picture_id: picture.id, picture_url: url_for(picture.picture))
+      }
     }, status: :ok
   end
 
   def create_video
     @event_pictures = EventPicture.where(event_id: params[:id])
     @picture_urls = @event_pictures.map { |picture| url_for(picture.picture) }
-  
+
     if @picture_urls.empty?
       render json: { video_created: false, message: 'No pictures found for this event.' }
       return
     end
-  
+
     puts "-------!!!!----!!!!---!!!---Creating video..."
     Dir.mktmpdir do |dir|
       video_path = create_video_from_images(@picture_urls, dir)
@@ -113,7 +112,6 @@ class API::V1::EventsController < ApplicationController
       end
     end
   end
-  
 
   def video_exists
     video_path = Rails.root.join('public', 'videos', "event_#{params[:event_id]}.mp4")
@@ -161,34 +159,33 @@ class API::V1::EventsController < ApplicationController
 
   def create_video_from_images(picture_urls, dir)
     image_files = []
-  
+
     picture_urls.each_with_index do |url, index|
       begin
         file = Tempfile.new(["image#{index}", '.jpg'], dir)
         file.binmode
-        file.write(URI.open(url).read)
+        file.write(URI.open(url, read_timeout: 10).read) # Aumenta el tiempo de espera a 10 segundos
         file.rewind
         image_files << file
       rescue => e
         puts "Error downloading image #{url}: #{e.message}"
       end
     end
-  
+
     video_path = Rails.root.join('public', 'videos', "event_#{params[:event_id]}.mp4")
-  
+
     if image_files.any?
       # Construye el video usando ffmpeg
       image_files_paths = image_files.map(&:path).join('|')
       system("ffmpeg -framerate 1/3 -pattern_type glob -i '#{image_files_paths}' -c:v libx264 #{video_path}")
-  
+
       image_files.each(&:close)
       image_files.each(&:unlink)
     else
       puts "No images available to create video"
       return nil
     end
-  
+
     video_path
   end
-  
 end

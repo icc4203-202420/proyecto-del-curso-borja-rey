@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, Button } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
 import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
 import { Video } from 'expo-av';
@@ -20,8 +19,17 @@ const EventShow = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await axios.get(`http://${IP_BACKEND}:3001/api/v1/events/${id}`);
-        setEvent(response.data);
+        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setEvent(data);
       } catch (error) {
         console.error('Error fetching event:', error);
       } finally {
@@ -35,8 +43,17 @@ const EventShow = () => {
 
   const fetchAttendances = async () => {
     try {
-      const response = await axios.get(`http://${IP_BACKEND}:3001/api/v1/events/${id}/attendances`);
-      setAttendances(response.data.attendances);
+      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${id}/attendances`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setAttendances(data.attendances);
     } catch (error) {
       console.error('Error fetching attendances:', error);
     }
@@ -79,15 +96,27 @@ const EventShow = () => {
 
   const handleResumeClick = async (eventId) => {
     try {
-      const response = await axios.get(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/video_exists`);
-      if (response.data.video_exists) {
-        setVideoUrl(response.data.video_url);
+      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/video_exists`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      if (data.video_exists) {
+        setVideoUrl(data.video_url);
         setModalVisible(true);
       } else {
-        const videoResponse = await axios.post(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/create_video`);
-        console.log('Creating video...', videoResponse.data);
-        if (response.data.video_created) {
-          setVideoUrl(response.data.video_url);
+        const videoResponse = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/create_video`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const videoData = await videoResponse.json();
+        console.log('Creating video...', videoData);
+        if (videoData.video_created) {
+          setVideoUrl(videoData.video_url);
           setModalVisible(true);
         }
       }
