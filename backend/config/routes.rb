@@ -27,7 +27,7 @@ Rails.application.routes.draw do
           get 'attendances', to: 'events#attendances'
           get 'event_pictures', to: 'events#event_pictures'
           get 'video_exists', to: 'events#video_exists'
-          post 'create_video', to: 'events#create_video' 
+          post 'create_video', to: 'events#create_video'
         end
       end
       resources :beers do
@@ -52,6 +52,8 @@ Rails.application.routes.draw do
       resources :addresses
       resources :countries
       resources :reviews
+      get 'feed', to: 'feeds#index'
     end
   end
+  mount ActionCable.server => '/cable'
 end

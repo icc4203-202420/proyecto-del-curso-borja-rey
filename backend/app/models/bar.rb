@@ -4,10 +4,11 @@ class Bar < ApplicationRecord
 
   has_many :bars_beers
   has_many :beers, through: :bars_beers
+  has_one :country, through: :address
 
   has_one_attached :image
 
-  accepts_nested_attributes_for :address 
+  accepts_nested_attributes_for :address
 
   validates :name, presence: true
   validates :image, content_type: { in: ['image/png', 'image/jpg', 'image/jpeg'],

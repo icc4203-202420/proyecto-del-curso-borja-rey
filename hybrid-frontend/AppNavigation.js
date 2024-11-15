@@ -14,6 +14,7 @@ import CreatePicture from './src/screens/CreatePicture';
 import EventPictures from './src/screens/EventPicturesScreen';
 import EventShow from './src/screens/EventShowScreen';
 import PictureShow from './src/screens/PictureShow';
+import Feed from './src/screens/FeedScreen';
 import BarShow from './src/screens/BarShowScreen';
 
 import BottomTabs from './src/components/BottomTabs';  // Mover Bottom Tabs a un componente separado
@@ -100,6 +101,7 @@ export default function AppNavigation() {
         <Stack.Screen name="EventPictures" component={EventPictures} />
         <Stack.Screen name="EventShow" component={EventShow} />
         <Stack.Screen name="BarShow" component={BarShow} />
+        <Stack.Screen name="Feed" component={Feed} />
         <Stack.Screen name="PictureShow" component={PictureShow} />
       </Stack.Navigator>
     </NavigationContainer>

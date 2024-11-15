@@ -6,6 +6,7 @@ import Beers from '../screens/BeersScreen';
 import Bars from '../screens/BarsScreen';
 import Users from '../screens/UsersScreen';
 import Home from '../screens/HomeScreen';
+import FeedScreen from '../screens/FeedScreen';
 import { UserContext } from '../context/UserContext';
 
 const Tab = createBottomTabNavigator();
@@ -53,6 +54,17 @@ export default function BottomTabs() {
           options={{
             tabBarIcon: ({ color, size }) => (
               <Icon name="people-outline" color={color} size={size} />
+            ),
+          }}
+        />
+      )}
+      {currentUser && (
+        <Tab.Screen 
+          name="Feed" 
+          component={FeedScreen} 
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="newspaper-outline" color={color} size={size} />
             ),
           }}
         />

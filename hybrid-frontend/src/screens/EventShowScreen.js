@@ -15,7 +15,7 @@ const EventShow = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
-  const urlDefinitivo = "https://www.youtube.com/watch?v=mCdA4bJAGGk"
+  const urlDefinitivo = "https://www.w3schools.com/html/mov_bbb.mp4"
 
   useEffect(() => {
     const fetchEvent = async () => {
