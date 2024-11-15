@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Button } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
 import { IP_BACKEND } from '@env';
@@ -13,14 +13,14 @@ const FeedScreen = () => {
   useEffect(() => {
     fetchFeedItems();
 
-    // Initialize Action Cable consumer
+    // Initialize Action Cable consumer for real-time updates
     const cable = createConsumer(`ws://${IP_BACKEND}:3001/cable`);
     const channel = cable.subscriptions.create('FeedChannel', {
       received(data) {
-        if (data.event_picture) {
-          setFeedItems((prevFeedItems) => [data.event_picture, ...prevFeedItems]);
-        } else if (data.review) {
-          setFeedItems((prevFeedItems) => [data.review, ...prevFeedItems]);
+        // Handle new data from the WebSocket channel
+        const newFeedItem = data.event_picture || data.review;
+        if (newFeedItem) {
+          setFeedItems((prevFeedItems) => [newFeedItem, ...prevFeedItems]);
         }
       },
     });
@@ -30,6 +30,7 @@ const FeedScreen = () => {
     };
   }, []);
 
+  // Fetch initial feed items from the server
   const fetchFeedItems = async () => {
     try {
       const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/feed`, {
@@ -48,9 +49,9 @@ const FeedScreen = () => {
   };
 
   const renderItem = ({ item }) => {
-    if (item.picture_url) {
+    if (item.type === 'event_picture') {
       return (
-        <TouchableOpacity onPress={() => navigation.navigate('EventShow', { id: item.event.id })}>
+        <TouchableOpacity onPress={() => navigation.navigate('EventShow', { id: item.event_id })}>
           <View style={styles.postContainer}>
             <Image source={{ uri: item.picture_url }} style={styles.image} />
             <Text style={styles.description}>{item.description}</Text>
@@ -58,8 +59,8 @@ const FeedScreen = () => {
           </View>
         </TouchableOpacity>
       );
-    } else if (item.rating) {
-      const barAddress = `${item.bar_address.line1}, ${item.bar_address.line2}, ${item.bar_address.city}, ${item.bar_address.country_id}`;
+    } else if (item.type === 'review') {
+      const barAddress = item.bar_address ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}` : 'Address not available';
       return (
         <TouchableOpacity onPress={() => navigation.navigate('BarShow', { id: item.bar_id })}>
           <View style={styles.postContainer}>
@@ -69,7 +70,6 @@ const FeedScreen = () => {
             <Text style={styles.description}>Bar: {item.bar_name}</Text>
             <Text style={styles.description}>Country: {item.bar_country}</Text>
             <Text style={styles.description}>Address: {barAddress}</Text>
-            <Button title="View Bar" onPress={() => navigation.navigate('BarShow', { id: item.bar_id })} />
           </View>
         </TouchableOpacity>
       );
@@ -89,12 +89,15 @@ const FeedScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    backgroundColor: '#F8F4E1',
+    flexGrow: 1,
   },
   postContainer: {
     marginBottom: 16,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 4,
     padding: 16,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -110,11 +113,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 16,
     color: '#333',
+    fontFamily: 'Belwe',
   },
   user: {
     marginTop: 4,
     fontSize: 14,
     color: '#666',
+    fontFamily: 'Belwe',
   },
 });
 
