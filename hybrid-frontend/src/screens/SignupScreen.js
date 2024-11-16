@@ -4,9 +4,9 @@ import { Formik, Field } from 'formik';
 import * as yup from 'yup';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { IP_BACKEND } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../context/UserContext';
+import axiosInstance from '../context/urlContext';
 
 const SignupSchema = yup.object({
   first_name: yup.string().required('The first name is necessary to signup'),
@@ -33,11 +33,11 @@ const Signup = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/countries`);
-        const data = await response.json();
-        setCountries(data);
+        const response = await axiosInstance.get('countries');
+        setCountries(response.data);
       } catch (error) {
         console.error('Error fetching countries:', error);
+        setErrorMessage('Error fetching countries. Please try again.');
       }
     };
 
@@ -47,7 +47,7 @@ const Signup = () => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
       <ScrollView 
@@ -90,29 +90,16 @@ const Signup = () => {
               const countryId = values.country;
 
               try {
-                const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/signup`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ user: userValues }),
-                });
-    
-                const data = await response.json();
+                const response = await axiosInstance.post('signup', { user: userValues });
+                const data = response.data;
                 const userId = data.data.id;
-    
+
                 if (addressValues.line1 || addressValues.line2 || addressValues.city || countryId) {
-                  const addressResponse = await fetch(`http://${IP_BACKEND}:3001/api/v1/addresses`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      address: { ...addressValues, country_id: countryId, user_id: userId },
-                    }),
+                  const addressResponse = await axiosInstance.post('addresses', {
+                    address: { ...addressValues, country_id: countryId, user_id: userId },
                   });
-    
-                  const addressData = await addressResponse.json();
+
+                  const addressData = addressResponse.data;
                   console.log('User1:', data.data);
                   AsyncStorage.setItem('current_user', JSON.stringify(data.data));
                   setCurrentUser(data.data);
@@ -132,7 +119,7 @@ const Signup = () => {
                   console.error('Error signing up:', error);
                   setErrorMessage('Error Signing up. Please try again.');
                 }
-                  setSubmitting(false);
+                setSubmitting(false);
               }
             }}
           >
@@ -251,7 +238,7 @@ const CustomInput = ({ field, form, ...props }) => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 16,
     backgroundColor: '#F8F4E1', // Usar el mismo color de fondo que BeersScreen

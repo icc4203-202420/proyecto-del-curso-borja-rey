@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
-import { IP_BACKEND } from '@env';
+import axiosInstance from '../context/urlContext';
 import { createConsumer } from '@rails/actioncable';
 
 const FeedScreen = () => {
@@ -33,16 +33,13 @@ const FeedScreen = () => {
   // Fetch initial feed items from the server
   const fetchFeedItems = async () => {
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/feed`, {
-        method: 'GET',
+      const response = await axiosInstance.get('feed', {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${currentUser.token}`, // Assuming you have a token for authentication
           'User-ID': currentUser.id, // Send the user ID in the header
         },
       });
-      const data = await response.json();
-      setFeedItems(data);
+      setFeedItems(response.data);
     } catch (error) {
       console.error('Error fetching feed items:', error);
     }
@@ -78,20 +75,25 @@ const FeedScreen = () => {
   };
 
   return (
-    <FlatList
-      data={feedItems}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
-      contentContainerStyle={styles.container}
-    />
+    <ScrollView contentContainerStyle={styles.container}>
+      <FlatList
+        data={feedItems}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.flatListContainer}
+      />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     paddingVertical: 20,
     paddingHorizontal: 20,
     backgroundColor: '#F8F4E1',
+  },
+  flatListContainer: {
     flexGrow: 1,
   },
   postContainer: {

@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, I
 import { useNavigation } from '@react-navigation/native';
 import BeerLogo from '../../assets/beerLogo.png';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
+import axiosInstance from '../context/urlContext';
 
 export default function Bars() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,8 +14,8 @@ export default function Bars() {
   const handleSearchBar = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/bars`);
-      const data = await response.json();
+      const response = await axiosInstance.get('bars');
+      const data = await response.data;
       const filteredBars = data.bars.filter(bar => 
         bar.name.toLowerCase().includes(searchTerm.toLowerCase())
       );

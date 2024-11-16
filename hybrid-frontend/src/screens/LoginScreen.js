@@ -2,10 +2,10 @@ import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import * as yup from 'yup';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native'; // Importar TouchableOpacity
-import { IP_BACKEND } from '@env';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../context/UserContext';
+import axiosInstance from '../context/urlContext';
 
 const LoginSchema = yup.object({
   email: yup.string().email('Invalid email').required('The email is necessary to login'),
@@ -18,30 +18,22 @@ const Login = () => {
   const { setCurrentUser } = useContext(UserContext);
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Formik
         initialValues={{ email: '', password: '' }}
         validationSchema={LoginSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          fetch(`http://${IP_BACKEND}:3001/api/v1/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user: values }),
-          })
-            .then(response => response.json())
-            .then(data => {
-              AsyncStorage.setItem('current_user', JSON.stringify(data.status.data.user));
-              setCurrentUser(data.status.data.user);
-              console.log("data: ", data.headers);
-              setSubmitting(false);
-              navigation.navigate('Home'); // Redirige al Main (BottomTabs) en caso de éxito
-            })
-            .catch(error => {
-              setErrorMessage('Invalid email or password.');
-              setSubmitting(false);
-            });
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            const response = await axiosInstance.post('login', { user: values });
+            const data = response.data;
+            await AsyncStorage.setItem('current_user', JSON.stringify(data.status.data.user));
+            setCurrentUser(data.status.data.user);
+            setSubmitting(false);
+            navigation.navigate('Home'); // Redirige al Main (BottomTabs) en caso de éxito
+          } catch (error) {
+            setErrorMessage('Invalid email or password.');
+            setSubmitting(false);
+          }
         }}
       >
         {({ errors, touched, isSubmitting, handleSubmit }) => (
@@ -72,7 +64,7 @@ const Login = () => {
           </View>
         )}
       </Formik>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -95,7 +87,7 @@ const CustomInput = ({ field, form, ...props }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 16,
     backgroundColor: '#F8F4E1', // Usar el mismo color de fondo que BeersScreen

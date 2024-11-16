@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import axiosInstance from '../context/urlContext';
 
 // Validación del formulario usando Yup
 const EventPictureSchema = yup.object({
@@ -28,7 +28,7 @@ const CreatePicture = () => {
 
       const reader = new FileReader();
       reader.readAsDataURL(blob);
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64Image = reader.result.split(',')[1]; // Obtener solo la parte base64
 
         const eventPictureValues = {
@@ -38,28 +38,20 @@ const CreatePicture = () => {
           image_base64: base64Image
         };
 
-        fetch(`http://${IP_BACKEND}:3001/api/v1/event_pictures`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ event_picture: eventPictureValues }),
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Event picture created successfully:', data);
-            setSubmitting(false);
-            navigation.navigate('EventPictures', { id: eventId });
-          })
-          .catch(error => {
-            if (error.response && error.response.status === 422) {
-              setErrorMessage('You already have uploaded a picture for this event.');
-            } else {
-              console.error('Error creating event picture:', error);
-              setErrorMessage('Error creating event picture. Please try again.');
-            }
-            setSubmitting(false);
-          });
+        try {
+          const response = await axiosInstance.post('event_pictures', { event_picture: eventPictureValues });
+          console.log('Event picture created successfully:', response.data);
+          setSubmitting(false);
+          navigation.navigate('EventPictures', { id: eventId });
+        } catch (error) {
+          if (error.response && error.response.status === 422) {
+            setErrorMessage('You already have uploaded a picture for this event.');
+          } else {
+            console.error('Error creating event picture:', error);
+            setErrorMessage('Error creating event picture. Please try again.');
+          }
+          setSubmitting(false);
+        }
       };
     } catch (error) {
       console.error('Error converting image to blob:', error);
@@ -95,7 +87,7 @@ const CreatePicture = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Formik
         initialValues={{
           event_id: '',
@@ -157,13 +149,13 @@ const CreatePicture = () => {
           </View>
         )}
       </Formik>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
     backgroundColor: '#F8F4E1',
   },

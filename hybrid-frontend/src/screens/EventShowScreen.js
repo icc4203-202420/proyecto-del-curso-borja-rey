@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, Pressable } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
 import { Video } from 'expo-av';
+import axiosInstance from '../context/urlContext';
 
 const EventShow = () => {
   const route = useRoute();
@@ -20,17 +20,8 @@ const EventShow = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setEvent(data);
+        const response = await axiosInstance.get(`events/${id}`);
+        setEvent(response.data);
       } catch (error) {
         console.error('Error fetching event:', error);
       } finally {
@@ -44,17 +35,8 @@ const EventShow = () => {
 
   const fetchAttendances = async () => {
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${id}/attendances`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setAttendances(data.attendances);
+      const response = await axiosInstance.get(`events/${id}/attendances`);
+      setAttendances(response.data.attendances);
     } catch (error) {
       console.error('Error fetching attendances:', error);
     }
@@ -68,15 +50,8 @@ const EventShow = () => {
       checked_in: true,
     };
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/attendances`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ attendance: attendanceValues }),
-      });
-      const data = await response.json();
-      console.log('Attendance created successfully:', data);
+      const response = await axiosInstance.post('attendances', { attendance: attendanceValues });
+      console.log('Attendance created successfully:', response.data);
       fetchAttendances(); // Refresh attendances
     } catch (error) {
       console.error('Error creating attendance:', error);
@@ -97,29 +72,17 @@ const EventShow = () => {
 
   const handleResumeClick = async (eventId) => {
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/video_exists`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const data = await response.json();
-      console.log('Checking if video exists...', data);
-      if (data.video_exists) {
-        setVideoUrl(data.video_url);
+      const response = await axiosInstance.get(`events/${eventId}/video_exists`);
+      console.log('Checking if video exists...', response.data);
+      if (response.data.video_exists) {
+        setVideoUrl(response.data.video_url);
         setModalVisible(true);
       } else {
-        const videoResponse = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${eventId}/create_video`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const videoData = await videoResponse.json();
-        console.log('Creating video...', videoData);
-        if (videoData.video_created) {
-          console.log('Video created successfully:', videoData.video_url);
-          setVideoUrl(videoData.video_url);
+        const videoResponse = await axiosInstance.post(`events/${eventId}/create_video`);
+        console.log('Creating video...', videoResponse.data);
+        if (videoResponse.data.video_created) {
+          console.log('Video created successfully:', videoResponse.data.video_url);
+          setVideoUrl(videoResponse.data.video_url);
           setModalVisible(true);
         }
       }
@@ -135,6 +98,7 @@ const EventShow = () => {
   if (!event) {
     return <Text style={styles.message}>Event not found.</Text>;
   }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.paper}>
@@ -293,7 +257,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  closeButton: {
+    backgroundColor: '#AF8F6F',
+    padding: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginTop: 16,
+  },
 });
-
 
 export default EventShow;

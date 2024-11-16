@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback, useContext, useReducer } from 
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
+import axiosInstance from '../context/urlContext';
 
 const initialState = {
   reviews: [],
@@ -52,9 +52,8 @@ function BeerShow() {
   useEffect(() => {
     const fetchBeer = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}`);
-        const data = await response.json();
-        setBeer(data);
+        const response = await axiosInstance.get(`beers/${id}`);
+        setBeer(response.data);
       } catch (error) {
         console.error('Error fetching beer:', error);
       }
@@ -62,9 +61,8 @@ function BeerShow() {
 
     const fetchBars = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/bars`);
-        const data = await response.json();
-        setBars(data.bars || []);
+        const response = await axiosInstance.get(`beers/${id}/bars`);
+        setBars(response.data.bars || []);
       } catch (error) {
         console.error('Error fetching bars:', error);
       }
@@ -72,19 +70,17 @@ function BeerShow() {
 
     const fetchBreweries = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/breweries`);
-        const data = await response.json();
-        setBreweries(data.breweries || []);
+        const response = await axiosInstance.get(`beers/${id}/breweries`);
+        setBreweries(response.data.breweries || []);
       } catch (error) {
-        console.error('Error fetching bars:', error);
+        console.error('Error fetching breweries:', error);
       }
     };
 
     const fetchReviews = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/reviews`);
-        const data = await response.json();
-        dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: data.reviews || [], currentUser } });
+        const response = await axiosInstance.get(`beers/${id}/reviews`);
+        dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: response.data.reviews || [], currentUser } });
       } catch (error) {
         dispatch({ type: 'FETCH_REVIEWS_ERROR', payload: error });
         console.error('Error fetching reviews:', error);
@@ -110,9 +106,8 @@ function BeerShow() {
     useCallback(() => {
       const fetchBeer = async () => {
         try {
-          const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}`);
-          const data = await response.json();
-          setBeer(data);
+          const response = await axiosInstance.get(`beers/${id}`);
+          setBeer(response.data);
         } catch (error) {
           console.error('Error fetching beer:', error);
         }
@@ -120,9 +115,8 @@ function BeerShow() {
 
       const fetchBars = async () => {
         try {
-          const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/bars`);
-          const data = await response.json();
-          setBars(data.bars || []);
+          const response = await axiosInstance.get(`beers/${id}/bars`);
+          setBars(response.data.bars || []);
         } catch (error) {
           console.error('Error fetching bars:', error);
         }
@@ -130,9 +124,8 @@ function BeerShow() {
 
       const fetchReviews = async () => {
         try {
-          const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers/${id}/reviews`);
-          const data = await response.json();
-          dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: data.reviews || [], currentUser } });
+          const response = await axiosInstance.get(`beers/${id}/reviews`);
+          dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: response.data.reviews || [], currentUser } });
         } catch (error) {
           dispatch({ type: 'FETCH_REVIEWS_ERROR', payload: error });
           console.error('Error fetching reviews:', error);

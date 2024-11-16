@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
+import axiosInstance from '../context/urlContext';
 
 function EventPictures() {
   const route = useRoute();
@@ -18,8 +18,8 @@ function EventPictures() {
   useEffect(() => {
     const fetchPictures = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events/${id}/event_pictures`);
-        const data = await response.json();
+        const response = await axiosInstance.get(`events/${id}/event_pictures`);
+        const data = response.data;
         console.log('Pictures:', data.pictures);
         setPictures(data.pictures);
       } catch (error) {

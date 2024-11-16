@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native'; // Importar TouchableOpacity
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik';
 import Slider from '@react-native-community/slider';
-import { IP_BACKEND } from '@env';
 import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axiosInstance from '../context/urlContext';
 
 yup.addMethod(yup.string, 'minWords', function (min, message) {
   return this.test('minWords', message, function (value) {
@@ -57,15 +57,8 @@ const BeerReviews = () => {
             beer_id: beerId
           };
           try {
-            const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/reviews`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ review: reviewValues }),
-            });
-            const data = await response.json();
-            console.log('Review created successfully:', data);
+            const response = await axiosInstance.post('reviews', { review: reviewValues });
+            console.log('Review created successfully:', response.data);
             setSubmitting(false);
             await AsyncStorage.removeItem("beer");
             navigation.navigate('BeerShow', { id: beerId, refresh: true });

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
+import axiosInstance from '../context/urlContext';
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,9 +14,8 @@ export default function Users() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/users`);
-      const data = await response.json();
-      
+      const response = await axiosInstance.get('users');
+      const data = await response.data;
       // Filtrar usuarios según el término de búsqueda
       const filteredUsers = data.filter(user => 
         user.handle.toLowerCase().includes(searchTerm.toLowerCase())

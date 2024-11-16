@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, I
 import { useNavigation } from '@react-navigation/native';
 import BeerLogo from '../../assets/beerLogo.png';
 import { IP_BACKEND } from '@env'; // Importar la variable de entorno
+import axiosInstance from '../context/urlContext';
 
 export default function Beers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,8 +15,8 @@ export default function Beers() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/beers`);
-      const data = await response.json();
+      const response = await axiosInstance.get('beers');
+      const data = await response.data;
       const filteredBeers = data.beers.filter(beer => 
         beer.name.toLowerCase().includes(searchTerm.toLowerCase())
       );

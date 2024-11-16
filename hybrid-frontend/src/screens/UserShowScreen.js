@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
-import axios from 'axios';
-import { IP_BACKEND } from '@env';
+import axiosInstance from '../context/urlContext';
 import { UserContext } from '../context/UserContext';
 import * as Notifications from 'expo-notifications';
 
@@ -21,9 +20,8 @@ const UserShow = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/events`);
-        const data = await response.json();
-        setEvents(data.events);
+        const response = await axiosInstance.get('events');
+        setEvents(response.data.events);
       } catch (error) {
         console.error('Error fetching Events:', error);
       }
@@ -35,9 +33,8 @@ const UserShow = () => {
         friend_id: id,
       };
       try {
-        const response = await axios.post(`http://${IP_BACKEND}:3001/api/v1/users/${id}/is_friend`, { friendship: isFriendValues });
-        const data = response.data;
-        setIsFriend(data.is_friend);
+        const response = await axiosInstance.post(`users/${id}/is_friend`, { friendship: isFriendValues });
+        setIsFriend(response.data.is_friend);
       } catch (error) {
         console.error('Error fetching is friend:', error);
       }
@@ -70,7 +67,7 @@ const UserShow = () => {
       event_id: selectedEvent,
     };
     try {
-      const response = await axios.post(`http://${IP_BACKEND}:3001/api/v1/users/${id}/friendships`, { friendship: friendshipValues });
+      const response = await axiosInstance.post(`users/${id}/friendships`, { friendship: friendshipValues });
       setIsFriend(true);
 
       // Redirige al usuario a la pantalla de inicio
@@ -79,7 +76,7 @@ const UserShow = () => {
       // Envía una notificación push
       const token = await registerForPushNotificationsAsync();
       if (token) {
-        await axios.post(`http://${IP_BACKEND}:3001/api/v1/notifications`, {
+        await axiosInstance.post('notifications', {
           to: token,
           title: 'New Friend Added',
           body: `You have added ${user.handle} as a friend!`,
@@ -93,9 +90,8 @@ const UserShow = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/users/${id}`);
-        const data = await response.json();
-        setUser(data);
+        const response = await axiosInstance.get(`users/${id}`);
+        setUser(response.data);
       } catch (error) {
         console.error('Error fetching user:', error);
       } finally {

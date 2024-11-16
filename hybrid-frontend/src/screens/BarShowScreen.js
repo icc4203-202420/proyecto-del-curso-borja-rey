@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useContext, useReducer } from 'react';
+import React, { useState, useEffect, useContext, useReducer } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
+import axiosInstance from '../context/urlContext';
 
 const initialState = {
   events: [],
@@ -44,9 +44,8 @@ function BarShow() {
   useEffect(() => {
     const fetchBar = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/bars/${id}`);
-        const data = await response.json();
-        setBar(data.bar);
+        const response = await axiosInstance.get(`bars/${id}`);
+        setBar(response.data.bar);
       } catch (error) {
         console.error('Error fetching bar:', error);
       }
@@ -54,9 +53,8 @@ function BarShow() {
 
     const fetchEvents = async () => {
       try {
-        const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/bars/${id}/events`);
-        const data = await response.json();
-        dispatch({ type: 'FETCH_EVENTS_SUCCESS', payload: { events: data.events || [] } });
+        const response = await axiosInstance.get(`bars/${id}/events`);
+        dispatch({ type: 'FETCH_EVENTS_SUCCESS', payload: { events: response.data.events || [] } });
       } catch (error) {
         dispatch({ type: 'FETCH_EVENTS_ERROR', payload: error });
         console.error('Error fetching events:', error);
@@ -75,15 +73,8 @@ function BarShow() {
       checked_in: true,
     };
     try {
-      const response = await fetch(`http://${IP_BACKEND}:3001/api/v1/attendances`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ attendance: attendanceValues }),
-      });
-      const data = await response.json();
-      console.log('Attendance created successfully:', data);
+      const response = await axiosInstance.post('attendances', { attendance: attendanceValues });
+      console.log('Attendance created successfully:', response.data);
     } catch (error) {
       console.error('Error creating attendance:', error);
     }
