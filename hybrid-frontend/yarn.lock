@@ -1783,7 +1783,7 @@ aggregate-error@^3.0.0:
 
 ajv@8.11.0:
   version "8.11.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.11.0.tgz#977e91dd96ca669f54a11e23e378e33b884a565f"
+  resolved "https://registry.npmjs.org/ajv/-/ajv-8.11.0.tgz"
   integrity sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==
   dependencies:
     fast-deep-equal "^3.1.1"
@@ -2889,7 +2889,7 @@ expo-constants@~17.0.0, expo-constants@~17.0.3:
 
 expo-dev-client@~5.0.2:
   version "5.0.2"
-  resolved "https://registry.yarnpkg.com/expo-dev-client/-/expo-dev-client-5.0.2.tgz#0536cbb3b901b8ea24e0af63cb82819beffb0204"
+  resolved "https://registry.npmjs.org/expo-dev-client/-/expo-dev-client-5.0.2.tgz"
   integrity sha512-c6Qqdos5yvPWEQUMncLABLy1aVO0qhpyCLRiYCLMHqQ28D/joMUFpQqzAbP1J0/v91HXDeLBNr+4e89fwlBTEw==
   dependencies:
     expo-dev-launcher "5.0.14"
@@ -2900,7 +2900,7 @@ expo-dev-client@~5.0.2:
 
 expo-dev-launcher@5.0.14:
   version "5.0.14"
-  resolved "https://registry.yarnpkg.com/expo-dev-launcher/-/expo-dev-launcher-5.0.14.tgz#a37e5ccdd1cdc01ac67f24038face90e146295d1"
+  resolved "https://registry.npmjs.org/expo-dev-launcher/-/expo-dev-launcher-5.0.14.tgz"
   integrity sha512-va7m9eyfLicsh+UjUhFAvTRZI9vBZNLuRhdK+7RkWBI68yo8U1rQOeEA9W6f21PmPVRf3qY6OgfXfJ1FKGABmA==
   dependencies:
     ajv "8.11.0"
@@ -2910,19 +2910,19 @@ expo-dev-launcher@5.0.14:
 
 expo-dev-menu-interface@1.9.1:
   version "1.9.1"
-  resolved "https://registry.yarnpkg.com/expo-dev-menu-interface/-/expo-dev-menu-interface-1.9.1.tgz#744588fa19c38fe75443a0d8150a8b2d0dfb6b8d"
+  resolved "https://registry.npmjs.org/expo-dev-menu-interface/-/expo-dev-menu-interface-1.9.1.tgz"
   integrity sha512-YciUyAwSfloU76JAc18Jvuv8JOZHBLM1E/DwAqNC/rLg5ju76CaSS0Hx1Q4MyF79yi3G/y9o34K0hJmCCyQ9LQ==
 
 expo-dev-menu@6.0.10:
   version "6.0.10"
-  resolved "https://registry.yarnpkg.com/expo-dev-menu/-/expo-dev-menu-6.0.10.tgz#9530a563d52b33f9142d2395a59ddc36513fe962"
+  resolved "https://registry.npmjs.org/expo-dev-menu/-/expo-dev-menu-6.0.10.tgz"
   integrity sha512-CW4l4JLxZb6IZHvqD/ikL9UKRSyyR64gqX77FqdaUAlh2HCbXNfNHpTVWoQgyXbfPknUB1qpS2eZhh+FTNN9Eg==
   dependencies:
     expo-dev-menu-interface "1.9.1"
 
 expo-dev-menu@6.0.9:
   version "6.0.9"
-  resolved "https://registry.yarnpkg.com/expo-dev-menu/-/expo-dev-menu-6.0.9.tgz#c0fd1f97bce560ed66f40f45324431603deee64d"
+  resolved "https://registry.npmjs.org/expo-dev-menu/-/expo-dev-menu-6.0.9.tgz"
   integrity sha512-xmPeJWH5Yw3NjrHD6dm2AhZUf8Lwf8kdFEIZcm4/xl7xyjY3rq9AxaR8+iB64koVclkwjPNqgn5MCfejbHOWog==
   dependencies:
     expo-dev-menu-interface "1.9.1"
@@ -2941,9 +2941,21 @@ expo-font@~13.0.1:
   dependencies:
     fontfaceobserver "^2.1.0"
 
+expo-image-loader@~5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-5.0.0.tgz#4f58a21ab26e40d6fccc211b664fd9fe21a5dcb8"
+  integrity sha512-Eg+5FHtyzv3Jjw9dHwu2pWy4xjf8fu3V0Asyy42kO+t/FbvW/vjUixpTjPtgKQLQh+2/9Nk4JjFDV6FwCnF2ZA==
+
+expo-image-picker@~16.0.2:
+  version "16.0.2"
+  resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-16.0.2.tgz#bead7f1108e790b3593b92cba9fbe3375d1841af"
+  integrity sha512-wlJy2EjZQlbz6v3QAOfpHWhq8GXXER5z7TeSTo5rMdQ/gn9B4YDGxY4nQqI+LRFBuIxpEnOXizUGDUJsoDwo6A==
+  dependencies:
+    expo-image-loader "~5.0.0"
+
 expo-json-utils@~0.14.0:
   version "0.14.0"
-  resolved "https://registry.yarnpkg.com/expo-json-utils/-/expo-json-utils-0.14.0.tgz#ad3cbbcb4fb22e4d23bf9fb19b611e36758861d2"
+  resolved "https://registry.npmjs.org/expo-json-utils/-/expo-json-utils-0.14.0.tgz"
   integrity sha512-xjGfK9dL0B1wLnOqNkX0jM9p48Y0I5xEPzHude28LY67UmamUyAACkqhZGaPClyPNfdzczk7Ej6WaRMT3HfXvw==
 
 expo-keep-awake@~14.0.1:
@@ -2958,7 +2970,7 @@ expo-linear-gradient@~14.0.1:
 
 expo-manifests@~0.15.0:
   version "0.15.3"
-  resolved "https://registry.yarnpkg.com/expo-manifests/-/expo-manifests-0.15.3.tgz#61b9923c983b1f8ab3a65ba0a147b01a09ded6da"
+  resolved "https://registry.npmjs.org/expo-manifests/-/expo-manifests-0.15.3.tgz"
   integrity sha512-yXP7/AN9gRvnCMyGn2esaaDtY3RwiALMJThmGKqaHjlv9cLtiL23aCw5EiNddyI0eZnuHlotGf68Yagz+UZD/Q==
   dependencies:
     "@expo/config" "~10.0.4"
@@ -3005,7 +3017,7 @@ expo-status-bar@~2.0.0:
 
 expo-updates-interface@~1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/expo-updates-interface/-/expo-updates-interface-1.0.0.tgz#b98c66b800d29561c62409556948b2af3d5316e5"
+  resolved "https://registry.npmjs.org/expo-updates-interface/-/expo-updates-interface-1.0.0.tgz"
   integrity sha512-93oWtvULJOj+Pp+N/lpTcFfuREX1wNeHtp7Lwn8EbzYYmdn37MvZU3TPW2tYYCZuhzmKEXnUblYcruYoDu7IrQ==
 
 expo-video@~2.0.0:
@@ -3954,7 +3966,7 @@ json-parse-better-errors@^1.0.1:
 
 json-schema-traverse@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz#ae7bcb3656ab77a73ba5c49bf654f38e6b6860e2"
+  resolved "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz"
   integrity sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==
 
 json5@^2.2.3:
@@ -5155,10 +5167,10 @@ react-native-safe-area-context@4.12.0:
   resolved "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-4.12.0.tgz"
   integrity sha512-ukk5PxcF4p3yu6qMZcmeiZgowhb5AsKRnil54YFUUAXVIS7PJcMHGGC+q44fCiBg44/1AJk5njGMez1m9H0BVQ==
 
-react-native-screens@~4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/react-native-screens/-/react-native-screens-4.0.0.tgz"
-  integrity sha512-QGQ8+d90chOZ9JwA2K01nFzrGCTMNjsiAKJGPUXcLEiIF77/VSjLjQE9ZluMtkva0gzGI9tb/yxETkJnkw1iag==
+react-native-screens@~4.1.0:
+  version "4.1.0"
+  resolved "https://registry.npmjs.org/react-native-screens/-/react-native-screens-4.1.0.tgz"
+  integrity sha512-tCBwe7fRMpoi/nIgZxE86N8b2SH8d5PlfGaQO8lgqlXqIyvwqm3u1HJCaA0tsacPyzhW7vVtRfQyq9e1j0S2gA==
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
@@ -6120,7 +6132,7 @@ update-browserslist-db@^1.1.1:
 
 uri-js@^4.2.2:
   version "4.4.1"
-  resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.4.1.tgz#9b1a52595225859e55f669d928f88c6c57f2a77e"
+  resolved "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz"
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"

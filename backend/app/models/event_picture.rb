@@ -5,5 +5,5 @@ class EventPicture < ApplicationRecord
 
   has_one_attached :picture
 
-  validates :picture, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg']
+  validates :picture, attached: true, content_type: ['image/png', 'image/jpg', 'image/jpeg', 'image/heic']
 end

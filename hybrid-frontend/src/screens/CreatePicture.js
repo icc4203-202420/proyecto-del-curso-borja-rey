@@ -3,8 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import * as ImagePicker from 'expo-image-picker';
 import { UserContext } from '../context/UserContext';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import axiosInstance from '../context/urlContext';
 
 // Validación del formulario usando Yup
@@ -48,6 +48,7 @@ const CreatePicture = () => {
             setErrorMessage('You already have uploaded a picture for this event.');
           } else {
             console.error('Error creating event picture:', error);
+            navigation.navigate('EventPictures', { id: eventId });
             setErrorMessage('Error creating event picture. Please try again.');
           }
           setSubmitting(false);
@@ -60,30 +61,44 @@ const CreatePicture = () => {
     }
   };
 
-  const openCamera = (setFieldValue) => {
-    launchCamera({ mediaType: 'photo', includeBase64: true }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        setFieldValue('image', response.assets[0].uri);
-        setPreviewUri(response.assets[0].uri);
-      }
+  const openCamera = async (setFieldValue) => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      alert('Permission to access camera is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: true,
     });
+
+    if (!result.canceled) {
+      setFieldValue('image', result.assets[0].uri);
+      setPreviewUri(result.assets[0].uri);
+    }
   };
 
-  const chooseFromGallery = (setFieldValue) => {
-    launchImageLibrary({ mediaType: 'photo', includeBase64: true }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        setFieldValue('image', response.assets[0].uri);
-        setPreviewUri(response.assets[0].uri);
-      }
+  const chooseFromGallery = async (setFieldValue) => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      alert('Permission to access gallery is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: true,
     });
+
+    if (!result.canceled) {
+      setFieldValue('image', result.assets[0].uri);
+      setPreviewUri(result.assets[0].uri);
+    }
   };
 
   return (

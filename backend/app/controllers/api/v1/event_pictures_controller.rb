@@ -1,4 +1,3 @@
-# app/controllers/api/v1/event_pictures_controller.rb
 class API::V1::EventPicturesController < ApplicationController
   include ImageProcessing
 
@@ -30,19 +29,25 @@ class API::V1::EventPicturesController < ApplicationController
 
   def create
     @event_picture = EventPicture.new(event_picture_params.except(:image_base64))
-    handle_image_attachment if event_picture_params[:image_base64]
+
+    if event_picture_params[:image_base64]
+      decoded_image = decode_image(event_picture_params[:image_base64])
+      @event_picture.picture.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
+    end
 
     if @event_picture.save
-      # Broadcast the new event picture to the feed channel
-      ActionCable.server.broadcast 'feed_channel', event_picture: @event_picture.as_json(include: [:user, :event]).merge(user_handle: @event_picture.user.handle)
-      render json: { event_picture: @event_picture, message: 'Event created successfully.' }, status: :created
+      ActionCable.server.broadcast 'feed_channel', event_picture: @event_picture.as_json(include: [:user, :event])
+      render json: @event_picture, status: :created
     else
       render json: @event_picture.errors, status: :unprocessable_entity
     end
   end
 
   def update
-    handle_image_attachment if event_picture_params[:image_base64]
+    if event_picture_params[:image_base64]
+      decoded_image = decode_image(event_picture_params[:image_base64])
+      @event_picture.picture.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
+    end
 
     if @event_picture.update(event_picture_params.except(:image_base64))
       render json: { event_picture: @event_picture, message: 'Event updated successfully.' }, status: :ok
@@ -67,11 +72,6 @@ class API::V1::EventPicturesController < ApplicationController
 
   def event_picture_params
     params.require(:event_picture).permit(:user_id, :event_id, :description, :image_base64)
-  end
-
-  def handle_image_attachment
-    decoded_image = decode_image(event_picture_params[:image_base64])
-    @event_picture.picture.attach(io: decoded_image[:io], filename: decoded_image[:filename], content_type: decoded_image[:content_type])
   end
 
   def decode_image(base64_image)
