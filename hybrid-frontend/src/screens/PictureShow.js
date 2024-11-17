@@ -1,241 +1,169 @@
-import React, { useState, useEffect, useCallback, useContext, useReducer } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { UserContext } from '../context/UserContext';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Formik, Field } from 'formik';
+import * as yup from 'yup';
 import axiosInstance from '../context/urlContext';
-
-const initialState = {
-  reviews: [],
-  rating: 0,
-  userReview: null,
-  loading: true,
-  error: null,
-};
-
-function reviewsReducer(state, action) {
-  switch (action.type) {
-    case 'FETCH_REVIEWS_SUCCESS':
-      const rate = action.payload.reviews.reduce((acc, review) => acc + parseFloat(review.rating), 0) / action.payload.reviews.length;
-      const userReview = action.payload.reviews.find(review => review.user_id === action.payload.currentUser?.id);
-      return {
-        ...state,
-        reviews: action.payload.reviews,
-        rating: rate,
-        userReview: userReview,
-        loading: false,
-      };
-    case 'FETCH_REVIEWS_ERROR':
-      return {
-        ...state,
-        error: action.payload,
-        loading: false,
-      };
-    default:
-      return state;
-  }
-}
-
-function BeerShow() {
+import { UserContext } from '../context/UserContext';
+// Validación del formulario usando Yup
+const TagSchema = yup.object({
+  user_id: yup.number().required('User is required'),
+});
+function PictureShow() {
   const route = useRoute();
-  const { id, refresh } = route.params;
-  const [beer, setBeer] = useState(null);
-  const [bars, setBars] = useState([]);
-  const [breweries, setBreweries] = useState([]);
-  const { currentUser } = useContext(UserContext); // Obtén currentUser desde UserContext
-
-  const [state, dispatch] = useReducer(reviewsReducer, initialState);
-  const { reviews, rating, userReview, loading, error } = state;
-
+  const { id } = route.params;
+  const [picture, setPicture] = useState({});
+  const [tags, setTags] = useState([]);
+  const [user, setUser] = useState({});
+  const [users, setUsers] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
+  const handleViewProfileClick = (userId) => {
+    navigation.navigate('UserShow', { id: userId });
+  };
+  const fetchTags = async () => {
+    try {
+      const response = await axiosInstance.get(`event_pictures/${id}`);
+      const data = response.data;
+      setTags(data.tags);
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchBeer = async () => {
+    const fetchPicture = async () => {
       try {
-        const response = await axiosInstance.get(`beers/${id}`);
-        setBeer(response.data);
+        const response = await axiosInstance.get(`event_pictures/${id}`);
+        const data = response.data;
+        console.log("Data: ", data);
+        console.log('Picture: ', data.picture);
+        setPicture(data.event_picture);
+        setUser(data.user);
       } catch (error) {
-        console.error('Error fetching beer:', error);
+        console.error('Error fetching pictures:', error);
       }
     };
 
-    const fetchBars = async () => {
+    const fetchUsers = async () => {
       try {
-        const response = await axiosInstance.get(`beers/${id}/bars`);
-        setBars(response.data.bars || []);
+        const response = await axiosInstance.get('users');
+        const data = response.data;
+        setUsers(data);
       } catch (error) {
-        console.error('Error fetching bars:', error);
+        console.error('Error fetching users:', error);
       }
     };
-
-    const fetchBreweries = async () => {
-      try {
-        const response = await axiosInstance.get(`beers/${id}/breweries`);
-        setBreweries(response.data.breweries || []);
-      } catch (error) {
-        console.error('Error fetching breweries:', error);
-      }
-    };
-
-    const fetchReviews = async () => {
-      try {
-        const response = await axiosInstance.get(`beers/${id}/reviews`);
-        dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: response.data.reviews || [], currentUser } });
-      } catch (error) {
-        dispatch({ type: 'FETCH_REVIEWS_ERROR', payload: error });
-        console.error('Error fetching reviews:', error);
-      }
-    };
-
-    fetchBeer();
-    fetchBars();
-    fetchBreweries();
-    fetchReviews();
-  }, [id, currentUser]);
-
-  const handleViewBarClick = (id) => {
-    navigation.navigate('BarDetails', { id });
-  };
-
-  const handleViewReviewsClick = (id) => {
-    AsyncStorage.setItem("beer", id.toString());
-    navigation.navigate('BeerReviews', { id });
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchBeer = async () => {
-        try {
-          const response = await axiosInstance.get(`beers/${id}`);
-          setBeer(response.data);
-        } catch (error) {
-          console.error('Error fetching beer:', error);
-        }
-      };
-
-      const fetchBars = async () => {
-        try {
-          const response = await axiosInstance.get(`beers/${id}/bars`);
-          setBars(response.data.bars || []);
-        } catch (error) {
-          console.error('Error fetching bars:', error);
-        }
-      };
-
-      const fetchReviews = async () => {
-        try {
-          const response = await axiosInstance.get(`beers/${id}/reviews`);
-          dispatch({ type: 'FETCH_REVIEWS_SUCCESS', payload: { reviews: response.data.reviews || [], currentUser } });
-        } catch (error) {
-          dispatch({ type: 'FETCH_REVIEWS_ERROR', payload: error });
-          console.error('Error fetching reviews:', error);
-        }
-      };
-
-      fetchBeer();
-      fetchBars();
-      fetchReviews();
-    }, [refresh, currentUser])
-  );
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#AF8F6F" />;
-  }
-
-  if (!beer) {
-    return <Text style={styles.message}>Beer not found.</Text>;
-  }
-
+    fetchTags();
+    fetchUsers();
+    fetchPicture();
+  }, [id]);
+  useEffect(() => {
+    setFilteredUsers(
+      users.filter(user => user.handle.toLowerCase().includes(searchText.toLowerCase())).slice(0, 3)
+    );
+  }, [searchText, users]);
   return (
     currentUser ? (
-      <ScrollView
-          style={{ flex: 1 }} // Asegura que el ScrollView ocupe todo el espacio disponible
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={true}
-        >
-        <View style={styles.paper}>
-          <View style={styles.box}>
-            <Text style={styles.title}>{beer.name}</Text>
-            <Text style={styles.subtitle}>Brewery: {beer.brewery || 'N/A'} | Rating: {rating.toFixed(2)}</Text>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: beer.image_url || "https://via.placeholder.com/400" }}
-              style={styles.image}
-            />
-          </View>
-          <View style={styles.box}>
-            <Text style={styles.description}>{beer.description || 'No description available.'}</Text>
-            <Text style={styles.description}>Alcohol: {beer.alcohol} | IBU: {beer.ibu}</Text>
-            <Text style={styles.description}>Malts: {beer.malts} | Hop: {beer.hop} | Yeast: {beer.yeast}</Text>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => console.log('Favorite clicked')}>
-              <Text style={styles.buttonText}>Favorite</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => handleViewReviewsClick(beer.id)}>
-              <Text style={styles.buttonText}>Review</Text>
-            </TouchableOpacity>
-          </View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Picture</Text>
+        <View style={styles.pictureContainer}>
+          <Image
+            source={{ uri: picture.picture_url }}
+            style={styles.picture}
+          />
+          <Text style={styles.description}>{user.handle}: {picture.description}</Text>
         </View>
-
-        {userReview && (
-          <View style={styles.paper}>
-            <View style={styles.box}>
-              <Text style={styles.title}>Your Review</Text>
-              <View style={styles.reviewBox}>
-                <Text style={styles.reviewText}>Rate: {userReview.rating} - {userReview.text}</Text>
+        <View style={styles.tagsContainer}>
+          <Text style={styles.subtitle}>Tags</Text>
+          <Formik
+            initialValues={{
+              user_id: ''
+            }}
+            validationSchema={TagSchema}
+            onSubmit={(values, { setSubmitting }) => {
+              const tagValues = {
+                event_picture_id: picture.id,
+                tagged_user_id: values.user_id,
+                tagged_by_id: currentUser.id
+              };
+              fetch(`http://${IP_BACKEND}:3001/api/v1/tags`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tag: tagValues }),
+              })
+                .then(response => response.json())
+                .then(data => {
+                  console.log('Tag created successfully:', data);
+                  setSubmitting(false);
+                  fetchTags(); // Actualizar la lista de etiquetas
+                })
+                .catch(error => {
+                  console.error('Error creating tag:', error);
+                  setSubmitting(false);
+                });
+            }}
+          >
+            {({ handleSubmit, setFieldValue, isSubmitting }) => (
+              <View style={styles.form}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search user by handle"
+                  value={searchText}
+                  onChangeText={setSearchText}
+                  onFocus={() => setIsDropdownVisible(true)}
+                  onBlur={() => setIsDropdownVisible(false)}
+                />
+                {isDropdownVisible && filteredUsers.length > 0 && (
+                  <View style={styles.dropdown}>
+                    {filteredUsers.map(user => (
+                      <TouchableOpacity
+                        key={user.id}
+                        onPress={() => {
+                          setFieldValue('user_id', user.id);
+                          setSearchText(user.handle);
+                          setFilteredUsers([]);
+                          setIsDropdownVisible(false);
+                        }}
+                        style={styles.dropdownItem}
+                      >
+                        <Text>{user.handle}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  <Text style={styles.buttonText}>Tag</Text>
+                </TouchableOpacity>
               </View>
-            </View>
-          </View>
-        )}
-
-        <View style={styles.paper}>
-          <View style={styles.box}>
-            <Text style={styles.title}>Where to drink?</Text>
-            {bars.length > 0 ? (
-              bars.map(bar => (
-                <View key={bar.id} style={styles.barBox}>
-                  <Text style={styles.barText}>{bar.name}</Text>
-                  <TouchableOpacity style={styles.buttonViewBar} onPress={() => handleViewBarClick(bar.id)}>
-                    <Text style={styles.buttonText}>View</Text>
-                  </TouchableOpacity>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.message}>No bars found.</Text>
             )}
-          </View>
-        </View>
-
-        <View style={styles.paper}>
-          <View style={styles.box}>
-            <Text style={styles.title}>Breweries</Text>
-            {breweries.length > 0 ? (
-              breweries.map(brewery => (
-                <View key={brewery.id} style={styles.barBox}>
-                  <Text style={styles.barText}>{brewery.name}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.message}>No breweries found.</Text>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.paper}>
-          <View style={styles.box}>
-            <Text style={styles.title}>Reviews</Text>
-            {reviews.length > 0 ? (
-              reviews.map((review, i) => (
-                <View key={review.id} style={styles.reviewBox}>
-                  <Text style={styles.reviewText}>{i + 1}. Rate: {review.rating} - {review.text}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.message}>No reviews found.</Text>
-            )}
-          </View>
+          </Formik>
+          {tags.length > 0 ? (
+            tags.map(tag => (
+              <View key={tag.id} style={styles.tag}>
+                <Text style={styles.tagText}>
+                  <Text style={styles.boldText}>{tag.tagged_by.handle}</Text>: {tag.tagged_user.handle}
+                </Text>
+                <TouchableOpacity
+                  style={styles.viewButton}
+                  onPress={() => handleViewProfileClick(tag.tagged_user.id)}
+                >
+                  <Text style={styles.buttonText}>View</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.message}>No Tags found.</Text>
+          )}
         </View>
       </ScrollView>
     ) : (
@@ -249,98 +177,103 @@ function BeerShow() {
     )
   );
 }
-
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    flexGrow: 1,
+    padding: 20,
     backgroundColor: '#F8F4E1',
-    flexGrow: 1, // Asegura que el ScrollView crezca si hay más contenido
-  },
-  paper: {
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 4,
-  },
-  box: {
-    padding: 8,
-    marginBottom:1,
   },
   title: {
     fontSize: 24,
     fontFamily: 'Belwe',
+    marginBottom: 16,
+  },
+  pictureContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  picture: {
+    width: 300,
+    height: 300,
+    borderRadius: 8,
     marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-  imageContainer: {
-    position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
   description: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: 16,
+    fontFamily: 'Belwe',
+    textAlign: 'center',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  tagsContainer: {
     marginTop: 16,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontFamily: 'Belwe',
+    marginBottom: 8,
+  },
+  form: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  searchInput: {
+    width: '100%',
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+  },
+  dropdown: {
+    width: '100%',
+    maxHeight: 150,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    marginBottom: 8,
+  },
+  dropdownItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   button: {
     backgroundColor: '#AF8F6F',
     padding: 12,
     borderRadius: 4,
     alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  buttonViewBar: {
-    backgroundColor: '#AF8F6F',
-    padding: 12,
-    borderRadius: 4,
-    alignItems: 'center',
-    marginHorizontal: 4,
-    alignSelf: 'flex-end', // Alinea el botón a la derecha
-    width: 'auto', // Permite que el ancho se ajuste automáticamente al contenido
   },
   buttonText: {
     color: 'white',
     fontFamily: 'Belwe',
   },
-  reviewBox: {
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    marginBottom: 5,
-  },
-  reviewText: {
-    fontSize: 14,
-  },
-  barBox: {
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
+  tag: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    marginBottom: 8,
   },
-  barText: {
-    fontSize: 14,
+  tagText: {
+    fontSize: 16,
+    fontFamily: 'Belwe',
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  viewButton: {
+    backgroundColor: '#AF8F6F',
+    padding: 8,
+    borderRadius: 4,
   },
   message: {
     fontSize: 16,
-    color: '#666',
+    fontFamily: 'Belwe',
     textAlign: 'center',
     marginVertical: 16,
   },
@@ -360,5 +293,4 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 });
-
-export default BeerShow;
+export default PictureShow;

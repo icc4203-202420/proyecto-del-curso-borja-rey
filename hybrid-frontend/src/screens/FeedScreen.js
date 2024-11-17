@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
@@ -13,17 +13,18 @@ const FeedScreen = () => {
   useEffect(() => {
     fetchFeedItems();
 
-    // Initialize Action Cable consumer for real-time updates
-    const cable = createConsumer(`ws://${IP_BACKEND}:3001/cable`);
-    const channel = cable.subscriptions.create('FeedChannel', {
-      received(data) {
-        // Handle new data from the WebSocket channel
-        const newFeedItem = data.event_picture || data.review;
-        if (newFeedItem) {
-          setFeedItems((prevFeedItems) => [newFeedItem, ...prevFeedItems]);
-        }
-      },
-    });
+    const cableConnection = createConsumer("ws://localhost:3001/cable");
+    const channel = cableConnection.subscriptions.create(
+      { channel: 'FeedChannel' },
+      {
+        received(data) {
+          const newFeedItem = data.event_picture || data.review;
+          if (newFeedItem) {
+            setFeedItems((prevFeedItems) => [newFeedItem, ...prevFeedItems]);
+          }
+        },
+      }
+    );
 
     return () => {
       channel.unsubscribe();
@@ -35,8 +36,8 @@ const FeedScreen = () => {
     try {
       const response = await axiosInstance.get('feed', {
         headers: {
-          'Authorization': `Bearer ${currentUser.token}`, // Assuming you have a token for authentication
-          'User-ID': currentUser.id, // Send the user ID in the header
+          Authorization: `Bearer ${currentUser.token}`,
+          'User-ID': currentUser.id,
         },
       });
       setFeedItems(response.data);
@@ -57,11 +58,15 @@ const FeedScreen = () => {
         </TouchableOpacity>
       );
     } else if (item.type === 'review') {
-      const barAddress = item.bar_address ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}` : 'Address not available';
+      const barAddress = item.bar_address
+        ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}`
+        : 'Address not available';
       return (
         <TouchableOpacity onPress={() => navigation.navigate('BarShow', { id: item.bar_id })}>
           <View style={styles.postContainer}>
-            <Text style={styles.description}>{item.user_handle} rated {item.beer_name} {item.rating} stars</Text>
+            <Text style={styles.description}>
+              {item.user_handle} rated {item.beer_name} {item.rating} stars
+            </Text>
             <Text style={styles.description}>Global rating: {item.global_rating}</Text>
             <Text style={styles.description}>Reviewed at: {item.created_at}</Text>
             <Text style={styles.description}>Bar: {item.bar_name}</Text>
@@ -75,25 +80,20 @@ const FeedScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <FlatList
-        data={feedItems}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.flatListContainer}
-      />
-    </ScrollView>
+    <FlatList
+      data={feedItems}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+      contentContainerStyle={styles.container}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
     paddingVertical: 20,
     paddingHorizontal: 20,
     backgroundColor: '#F8F4E1',
-  },
-  flatListContainer: {
     flexGrow: 1,
   },
   postContainer: {
