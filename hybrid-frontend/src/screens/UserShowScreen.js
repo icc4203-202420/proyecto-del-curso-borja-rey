@@ -45,6 +45,7 @@ const UserShow = () => {
   }, [id, currentUser]);
 
   const registerForPushNotificationsAsync = async () => {
+    console.log('Registering for push notifications...');
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
@@ -70,17 +71,17 @@ const UserShow = () => {
       const response = await axiosInstance.post(`users/${id}/friendships`, { friendship: friendshipValues });
       setIsFriend(true);
 
-      // Redirige al usuario a la pantalla de inicio
-      navigation.replace('Main');
-
       // Envía una notificación push
       const token = await registerForPushNotificationsAsync();
+      console.log("Token: ", token);
       if (token) {
         await axiosInstance.post('notifications', {
           to: token,
           title: 'New Friend Added',
           body: `You have added ${user.handle} as a friend!`,
         });
+        // Redirige al usuario a la pantalla de inicio
+        navigation.replace('Main');
       }
     } catch (error) {
       console.error('Error creating friendship:', error);

@@ -20,13 +20,18 @@ class API::V1::ReviewsController < ApplicationController
 
   def create
     @review = @user.reviews.new(review_params)
+    puts "user: #{@user.handle}"
+    puts "beer: #{@beer.name}"
     @user_review = Review.where(user: @user, beer: @beer)
     if @user_review.exists?
+      puts "User already reviewed this beer"
       render json: { error: "User already reviewed this beer" }, status: :unprocessable_entity
     else
       if @review.save
         # Broadcast the new review to the feed channel
-        ActionCable.server.broadcast 'feed_channel', review: @review.as_json(include: [:user, :beer, :bar]).merge(user_handle: @review.user.handle, beer_name: @review.beer.name, bar_name: @review.bar.name)
+        review_data = @review.as_json(include: [:user, :beer]).merge(user_handle: @review.user.handle, beer_name: @review.beer.name)
+        puts "Broadcasting review data: #{review_data.inspect}"
+        ActionCable.server.broadcast 'feed_channel', review_data
         render json: @review, status: :created, location: api_v1_review_url(@review)
       else
         render json: @review.errors, status: :unprocessable_entity
