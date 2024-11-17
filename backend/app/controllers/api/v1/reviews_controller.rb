@@ -30,13 +30,18 @@ class API::V1::ReviewsController < ApplicationController
       render json: { error: "User already reviewed this beer" }, status: :unprocessable_entity
     else
       if @review.save
-        review_data = @review.as_json(include: [:user, :beer]).merge(user_handle: @review.user.handle, beer_name: @review.beer.name)
-        puts "Broadcasting review data: #{review_data.inspect}"
-        ActionCable.server.broadcast 'feed_channel', review_data
+        review_data = @review.as_json(include: [:user, :beer]).merge(
+          type: 'review',
+          user_handle: @review.user.handle,
+          beer_name: @review.beer.name,
+          global_rating: @review.beer.reviews.average(:rating).to_f.round(2) # Si quieres enviar esta información
+        )
+        ActionCable.server.broadcast 'feed_channel', review: review_data
         render json: @review, status: :created, location: api_v1_review_url(@review)
       else
         render json: @review.errors, status: :unprocessable_entity
       end
+
     end
   end
 

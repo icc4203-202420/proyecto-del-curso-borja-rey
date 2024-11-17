@@ -3,7 +3,6 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ScrollView }
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
-import { createConsumer } from '@rails/actioncable';
 
 const FeedScreen = () => {
   const [feedItems, setFeedItems] = useState([]);
@@ -13,20 +12,37 @@ const FeedScreen = () => {
   useEffect(() => {
     fetchFeedItems();
 
-    // Initialize Action Cable consumer for real-time updates
-    const cable = createConsumer(`ws://${IP_BACKEND}:3001/cable`);
-    const channel = cable.subscriptions.create('FeedChannel', {
-      received(data) {
-        // Handle new data from the WebSocket channel
-        const newFeedItem = data.event_picture || data.review;
-        if (newFeedItem) {
-          setFeedItems((prevFeedItems) => [newFeedItem, ...prevFeedItems]);
-        }
-      },
-    });
+    // Initialize WebSocket connection
+    const ws = new WebSocket('wss://30e7-191-113-128-201.ngrok-free.app/cable'); // Reemplaza con tu URL de ngrok
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+      ws.send(
+        JSON.stringify({
+          command: 'subscribe',
+          identifier: JSON.stringify({ channel: 'FeedChannel' }), // Asegúrate de que el canal esté configurado correctamente en el servidor
+        })
+      );
+    };
+
+    ws.onmessage = (event) => {
+      const response = JSON.parse(event.data);
+      const message = response.message;
+      if (message) {
+        setFeedItems((prevFeedItems) => [message, ...prevFeedItems]);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
 
     return () => {
-      channel.unsubscribe();
+      ws.close();
     };
   }, []);
 
@@ -57,16 +73,11 @@ const FeedScreen = () => {
         </TouchableOpacity>
       );
     } else if (item.type === 'review') {
-      const barAddress = item.bar_address ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}` : 'Address not available';
       return (
         <TouchableOpacity onPress={() => navigation.navigate('BarShow', { id: item.bar_id })}>
           <View style={styles.postContainer}>
             <Text style={styles.description}>{item.user_handle} rated {item.beer_name} {item.rating} stars</Text>
             <Text style={styles.description}>Global rating: {item.global_rating}</Text>
-            <Text style={styles.description}>Reviewed at: {item.created_at}</Text>
-            <Text style={styles.description}>Bar: {item.bar_name}</Text>
-            <Text style={styles.description}>Country: {item.bar_country}</Text>
-            <Text style={styles.description}>Address: {barAddress}</Text>
           </View>
         </TouchableOpacity>
       );
@@ -79,7 +90,7 @@ const FeedScreen = () => {
       <FlatList
         data={feedItems}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => (item.id ? item.id.toString() : `key-${index}`)}
         contentContainerStyle={styles.flatListContainer}
       />
     </ScrollView>
@@ -115,13 +126,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 16,
     color: '#333',
-    fontFamily: 'Belwe',
   },
   user: {
     marginTop: 4,
     fontSize: 14,
     color: '#666',
-    fontFamily: 'Belwe',
   },
 });
 
