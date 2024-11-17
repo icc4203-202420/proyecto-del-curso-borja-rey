@@ -43,6 +43,9 @@ Rails.application.routes.draw do
           post 'friendships', to: 'users#create_friendship'
           post 'is_friend', to: 'users#is_friend'
         end
+        collection do
+          post 'save_push_token'
+        end
         resources :reviews, only: [:index]
       end
       resources :notifications, only: [:create]

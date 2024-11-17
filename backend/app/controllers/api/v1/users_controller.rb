@@ -21,7 +21,6 @@ class API::V1::UsersController < ApplicationController
   end
 
   def update
-    #byebug
     if @user.update(user_params)
       render :show, status: :ok, location: api_v1_users_path(@user)
     else
@@ -45,6 +44,15 @@ class API::V1::UsersController < ApplicationController
       @friendship = Friendship.new(user_id: friendship_values[:user_id], friend_id: friendship_values[:friend_id], event_id: event_id)
       
       if @friendship.save
+        # Enviar notificación push al usuario que está agregando al amigo (Usuario A)
+        user = User.find(friendship_values[:user_id])
+        puts "User found: #{user.inspect}"
+        if user.push_token.present?
+          puts "Sending push notification to token: #{user.push_token}"
+          send_push_notification(user.push_token, 'Friend Added', "You have added #{User.find(friendship_values[:friend_id]).handle} as a friend!")
+        else
+          puts "No push token found for user"
+        end
         render json: @friendship, status: :ok
       else
         puts @friendship.errors.full_messages
@@ -67,6 +75,15 @@ class API::V1::UsersController < ApplicationController
     end
   end
 
+  def save_push_token
+    @user = User.find(params[:user_id])
+    if @user.update(push_token: params[:token])
+      render json: { success: true }
+    else
+      render json: { error: 'Failed to save push token' }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_user
@@ -80,5 +97,19 @@ class API::V1::UsersController < ApplicationController
               country_attributes: [:id, :name]],
               reviews_attributes: [:id, :text, :rating, :beer_id, :_destroy]
             })
+  end
+
+  def send_push_notification(token, title, body)
+    message = {
+      to: token,
+      sound: 'default',
+      title: title,
+      body: body,
+      data: { someData: 'goes here' }
+    }
+
+    puts "Sending push notification with message: #{message.inspect}"
+    response = Exponent::Push::Client.new.publish(message)
+    puts "Push notification response: #{response.body}"
   end
 end

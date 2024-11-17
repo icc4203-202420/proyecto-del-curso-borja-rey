@@ -1,82 +1,11 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import { View, Text, Button, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import axiosInstance from '../context/urlContext';
 import { UserContext } from '../context/UserContext';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
-async function sendPushNotification(expoPushToken) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'New Friend Added',
-    body: 'You have added a new friend!',
-    data: { someData: 'goes here' },
-  };
-
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
-
-async function registerForPushNotificationsAsync() {
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Permission not granted to get push token for push notification!');
-      return;
-    }
-    const projectId = Constants.manifest.extra.eas.projectId;
-    if (!projectId) {
-      alert('Project ID not found');
-      return;
-    }
-    try {
-      const pushTokenString = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId,
-        })
-      ).data;
-      console.log(pushTokenString);
-      return pushTokenString;
-    } catch (e) {
-      alert(`Error getting push token: ${e}`);
-    }
-  } else {
-    alert('Must use physical device for push notifications');
-  }
-}
+import { NotificationContext } from '../../AppNavigation';
+import { registerForPushNotificationsAsync } from '../utils/registerForPushNotificationsAsync';
 
 const UserShow = () => {
   const route = useRoute();
@@ -88,29 +17,7 @@ const UserShow = () => {
   const [selectedEvent, setSelectedEvent] = useState(0);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(undefined);
-  const notificationListener = useRef();
-  const responseListener = useRef();
-
-  useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then(token => setExpoPushToken(token ?? ''))
-      .catch(error => setExpoPushToken(`${error}`));
-
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
-
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
-
-    return () => {
-      notificationListener.current && Notifications.removeNotificationSubscription(notificationListener.current);
-      responseListener.current && Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+  const { expoPushToken, sendPushNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -139,6 +46,10 @@ const UserShow = () => {
     fetchEvents();
   }, [id, currentUser]);
 
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
   const handleNewFriend = async () => {
     const friendshipValues = {
       user_id: currentUser.id,
@@ -151,7 +62,7 @@ const UserShow = () => {
       if (response.data.friend_id) {
         setIsFriend(true);
         if (expoPushToken) {
-          await sendPushNotification(expoPushToken);
+          await sendPushNotification(expoPushToken, 'New Friend Added', 'You have added a new friend!');
         }
       }
     } catch (error) {
