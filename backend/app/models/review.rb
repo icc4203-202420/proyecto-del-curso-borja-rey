@@ -8,7 +8,9 @@ class Review < ApplicationRecord
   private
 
   def update_beer_rating
+    puts "avg rating b: #{beer.avg_rating}"
+    puts "Updating beer rating"
     beer.update_avg_rating
+    puts "avg rating a: #{beer.avg_rating}"
   end
-
 end

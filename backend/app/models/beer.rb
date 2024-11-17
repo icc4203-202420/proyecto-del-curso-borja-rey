@@ -19,9 +19,16 @@ class Beer < ApplicationRecord
 
   def update_avg_rating
     if reviews.any?
+      puts "Updating avg rating"
       update(avg_rating: reviews.average(:rating).to_f)
+      puts "avg rating: #{avg_rating}"
     else
       update(avg_rating: 0.0)
     end
-  end  
+  end
+
+  def update(*args)
+    puts "update called with args: #{args.inspect}"
+    super
+  end
 end

@@ -53,8 +53,8 @@ const BeerReviews = () => {
           const reviewValues = {
             text: values.text,
             rating: values.rating,
-            user_id: userId,
-            beer_id: beerId
+            beer_id: beerId,
+            user_id: userId
           };
           try {
             const response = await axiosInstance.post('reviews', { review: reviewValues });

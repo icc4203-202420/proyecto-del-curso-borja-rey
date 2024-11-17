@@ -45,7 +45,7 @@ Rails.application.routes.draw do
         end
         resources :reviews, only: [:index]
       end
-
+      resources :notifications, only: [:create]
       resources :tags
       resources :event_pictures
       resources :attendances

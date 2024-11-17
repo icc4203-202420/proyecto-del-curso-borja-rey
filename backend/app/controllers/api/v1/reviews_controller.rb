@@ -21,8 +21,11 @@ class API::V1::ReviewsController < ApplicationController
     @review = @user.reviews.new(review_params)
     puts "user: #{@user.handle}"
     puts "beer: #{@beer.name}"
+    puts "user: #{@user.handle}"
+    puts "beer: #{@beer.name}"
     @user_review = Review.where(user: @user, beer: @beer)
     if @user_review.exists?
+      puts "User already reviewed this beer"
       puts "User already reviewed this beer"
       render json: { error: "User already reviewed this beer" }, status: :unprocessable_entity
     else
