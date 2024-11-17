@@ -57,7 +57,7 @@ async function registerForPushNotificationsAsync() {
       alert('Permission not granted to get push token for push notification!');
       return;
     }
-    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    const projectId = Constants.manifest.extra.eas.projectId;
     if (!projectId) {
       alert('Project ID not found');
       return;
@@ -147,7 +147,8 @@ const UserShow = () => {
     };
     try {
       const response = await axiosInstance.post(`users/${id}/friendships`, { friendship: friendshipValues });
-      if (response.data.friendship) {
+      console.log('Friendship created:', response.data);
+      if (response.data.friend_id) {
         setIsFriend(true);
         if (expoPushToken) {
           await sendPushNotification(expoPushToken);

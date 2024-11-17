@@ -158,7 +158,7 @@ const EventShow = () => {
         <View style={styles.modalView}>
           <View style={styles.videoContainer}>
             <Video
-              source={{ uri: urlDefinitivo }}
+              source={{ uri: videoUrl }}
               rate={1.0}
               volume={1.0}
               isMuted={false}
