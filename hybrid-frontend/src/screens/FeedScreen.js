@@ -1,23 +1,47 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, TextInput, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
+import webSocketURL from '../context/webSocketURL';
+import { createConsumer } from '@rails/actioncable';
 
 const FeedScreen = () => {
   const [feedItems, setFeedItems] = useState([]);
   const [filteredFeedItems, setFilteredFeedItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [beerResults, setBeerResults] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    fetchFeedItems();
+
+    // Initialize Action Cable consumer for real-time updates
+    console.log('Connecting to WebSocket:', webSocketURL);
+    const cable = createConsumer(webSocketURL);
+    const channel = cable.subscriptions.create('FeedChannel', {
+      received(data) {
+        // Handle new data from the WebSocket channel
+        const newFeedItem = data.event_picture || data.review;
+        if (newFeedItem) {
+          setFeedItems((prevFeedItems) => [newFeedItem, ...prevFeedItems]);
+        }
+      },
+    });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     fetchFeedItems();
   }, []);
 
   const fetchFeedItems = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.get('feed', {
         headers: {
@@ -29,52 +53,42 @@ const FeedScreen = () => {
       setFilteredFeedItems(response.data);
     } catch (error) {
       console.error('Error fetching feed items:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const searchBeerByName = async (query) => {
-    try {
-      if (query.trim() === '') {
-        setBeerResults([]);
-        setFilteredFeedItems(feedItems);
-        return;
-      }
-      const response = await axiosInstance.get(`beers/search?name=${query}`, {
-        headers: {
-          'Authorization': `Bearer ${currentUser.token}`,
-        },
-      });
-      setBeerResults(response.data.beers);
-      setFilteredFeedItems(
-        feedItems.filter(item => item.beer_name?.toLowerCase().includes(query.toLowerCase()))
-      );
-    } catch (error) {
-      console.error('Error searching beers:', error);
-    }
+  const handleSearch = () => {
+    const filtered = feedItems.filter(item => 
+      item.beer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.bar_country?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.user_handle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.bar_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredFeedItems(filtered);
   };
 
   const handleViewClick = (id) => {
-    navigation.navigate('BarShow', { id });
+    navigation.navigate('BeerShow', { id });
   };
 
   const renderItem = ({ item }) => {
-    
     if (item.type === 'event_picture') {
       return (
-          <View style={styles.postContainer}>
-        <Image source={{ uri: item.picture_url }} style={styles.image} />
-        {item.user_handle && (
-          <Text>
-            <Text style={styles.boldText}>{item.user_handle}</Text>: {item.description}
-          </Text>
-        )}
-        <TouchableOpacity
+        <View style={styles.postContainer}>
+          <Image source={{ uri: item.picture_url }} style={styles.image} />
+          {item.user_handle && (
+            <Text>
+              <Text style={styles.boldText}>{item.user_handle}</Text>: {item.description}
+            </Text>
+          )}
+          <TouchableOpacity
             style={styles.viewButton}
             onPress={() => navigation.navigate('EventShow', { id: item.event_id })}
           >
-            <Text style={styles.viewButtonText}>View Bar</Text>
+            <Text style={styles.viewButtonText}>View Event</Text>
           </TouchableOpacity>
-          </View>
+        </View>
       );
     } else if (item.type === 'review') {
       const address = item.bar_address && item.bar_address.line1
@@ -121,12 +135,12 @@ const FeedScreen = () => {
                 <Text style={styles.boldText}>Address:</Text> {address}
               </Text>
             )}
-            {item.bar_id && (
+            {item.beer_id && (
               <TouchableOpacity
                 style={styles.viewButton}
-                onPress={() => handleViewClick(item.bar_id)}
+                onPress={() => handleViewClick(item.beer_id)}
               >
-                <Text style={styles.viewButtonText}>View Bar</Text>
+                <Text style={styles.viewButtonText}>View Beer</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -138,21 +152,35 @@ const FeedScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.filterButton} onPress={() => setIsModalVisible(true)}>
-        <Text style={styles.filterButtonText}>Search</Text>
-      </TouchableOpacity>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Text style={styles.searchButtonText}>Search</Text>
+        </TouchableOpacity>
+      </View>
 
-      <FlatList
-        data={filteredFeedItems}
-        renderItem={renderItem}
-        keyExtractor={(item) => (item.id ? item.id.toString() : `key-${Math.random()}`)}
-        contentContainerStyle={styles.flatListContainer}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Text>No feed items available</Text>
-          </View>
-        )}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : filteredFeedItems.length === 0 ? (
+        <Text>No feed items found.</Text>
+      ) : (
+        <FlatList
+          data={filteredFeedItems}
+          renderItem={renderItem}
+          keyExtractor={(item) => (item.id ? item.id.toString() : `key-${Math.random()}`)}
+          contentContainerStyle={styles.flatListContainer}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text>No feed items available</Text>
+            </View>
+          )}
+        />
+      )}
 
       {/* Modal for searching */}
       <Modal visible={isModalVisible} transparent={true} animationType="slide">
@@ -160,20 +188,11 @@ const FeedScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Search for a beer..."
-            value={searchQuery}
+            value={searchTerm}
             onChangeText={(text) => {
-              setSearchQuery(text);
-              searchBeerByName(text);
+              setSearchTerm(text);
+              handleSearch();
             }}
-          />
-          <FlatList
-            data={beerResults}
-            keyExtractor={(beer) => beer.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => setFilteredFeedItems(feedItems.filter(feed => feed.beer_name === item.name))}>
-                <Text style={styles.modalOption}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
           />
           <TouchableOpacity onPress={() => setIsModalVisible(false)}>
             <Text style={styles.closeModal}>Close</Text>
@@ -187,7 +206,38 @@ const FeedScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F0F5',
+    backgroundColor: '#F8F4E1',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    borderColor: '#000',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  searchButton: {
+    marginLeft: 10,
+    backgroundColor: '#AF8F6F',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  searchButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   flatListContainer: {
     flexGrow: 1,
@@ -247,19 +297,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 20,
   },
-  filterButton: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 25,
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-    margin: 10,
-  },
-  filterButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   viewButton: {
     marginTop: 10,
     backgroundColor: '#AF8F6F',
@@ -306,6 +343,11 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     marginTop: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

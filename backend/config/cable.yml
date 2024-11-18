@@ -1,6 +1,10 @@
 development:
   adapter: async
 
+  allowed_request_origins:
+    - 'http://localhost:3000'
+    - <% ENV['CABLE_URL'] %>
+
 test:
   adapter: test
 

@@ -64,3 +64,4 @@ gem 'pry', '~> 0.14.2'
 gem 'pundit'
 
 gem 'exponent-server-sdk', require: 'exponent-server-sdk'
+gem 'dotenv-rails', groups: [:development, :test]

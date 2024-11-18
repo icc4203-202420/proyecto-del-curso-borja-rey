@@ -1,3 +1,11 @@
+if (typeof global.addEventListener !== "function") {
+  global.addEventListener = () => {};
+}
+
+if (typeof global.removeEventListener !== "function") {
+  global.removeEventListener = () => {};
+}
+
 import React, { useState, useEffect, useRef, createContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
