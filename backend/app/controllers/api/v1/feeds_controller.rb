@@ -34,7 +34,7 @@ class API::V1::FeedsController < ApplicationController
             bar_name: bar ? bar.name : 'N/A',
             bar_country: bar && bar.address ? Country.find_by(id: bar.address.country_id)&.name || 'N/A' : 'N/A',
             bar_address: bar && bar.address ? format_address(bar.address) : nil,
-            beer_id: item.beer.id
+            bar_id: bar ? bar.id : nil
           }
         end
       }.compact, status: :ok

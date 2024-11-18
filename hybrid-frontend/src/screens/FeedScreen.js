@@ -1,361 +1,315 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useContext, useReducer } from 'react';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
-import webSocketURL from '../context/webSocketURL';
-import { createConsumer } from '@rails/actioncable';
 
-const FeedScreen = () => {
-  const [feedItems, setFeedItems] = useState([]);
-  const [filteredFeedItems, setFilteredFeedItems] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+const initialState = {
+  events: [],
+  loading: true,
+  error: null,
+};
+
+function eventsReducer(state, action) {
+  switch (action.type) {
+    case 'FETCH_EVENTS_SUCCESS':
+      return {
+        ...state,
+        events: action.payload.events,
+        loading: false,
+      };
+    case 'FETCH_EVENTS_ERROR':
+      return {
+        ...state,
+        error: action.payload,
+        loading: false,
+      };
+    default:
+      return state;
+  }
+}
+
+function BarShow() {
+  const route = useRoute();
+  const { id } = route.params;
+  const [bar, setBar] = useState(null);
+  const [checkedInEvents, setCheckedInEvents] = useState([]);
   const { currentUser } = useContext(UserContext);
+
+  const [state, dispatch] = useReducer(eventsReducer, initialState);
+  const { events, loading, error } = state;
+
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetchFeedItems();
-
-    // Initialize Action Cable consumer for real-time updates
-    console.log('Connecting to WebSocket:', webSocketURL);
-    const cable = createConsumer(webSocketURL);
-    const channel = cable.subscriptions.create('FeedChannel', {
-      received(data) {
-        // Handle new data from the WebSocket channel
-        const newFeedItem = data.event_picture || data.review;
-        if (newFeedItem) {
-          console.log('New feed item');
-          setFeedItems((prevFeedItems) => {
-            const updatedFeedItems = [newFeedItem, ...prevFeedItems];
-            setFilteredFeedItems(updatedFeedItems.filter(item => 
-              item.beer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              item.bar_country?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              item.user_handle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              item.bar_name?.toLowerCase().includes(searchTerm.toLowerCase())
-            ));
-            return updatedFeedItems;
-          });
-        }
-      },
-    });
-
-    return () => {
-      channel.unsubscribe();
+    const fetchBar = async () => {
+      try {
+        const response = await axiosInstance.get(`bars/${id}`);
+        setBar(response.data.bar);
+      } catch (error) {
+        console.error('Error fetching bar:', error);
+      }
     };
-  }, [searchTerm]);
 
-  const fetchFeedItems = async () => {
-    setLoading(true);
+    const fetchEvents = async () => {
+      try {
+        const response = await axiosInstance.get(`bars/${id}/events`);
+        dispatch({ type: 'FETCH_EVENTS_SUCCESS', payload: { events: response.data.events || [] } });
+      } catch (error) {
+        dispatch({ type: 'FETCH_EVENTS_ERROR', payload: error });
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    const fetchCheckedInEvents = async () => {
+      try {
+        const response = await axiosInstance.get(`users/${currentUser.id}/checked_in_events`);
+        setCheckedInEvents(response.data.checked_in_events || []);
+      } catch (error) {
+        console.error('Error fetching checked-in events:', error);
+      }
+    };
+
+    fetchBar();
+    fetchEvents();
+    fetchCheckedInEvents();
+  }, [id, currentUser]);
+
+  const handleCheckinEvent = async (eventId) => {
+    const userId = currentUser.id;
+    const attendanceValues = {
+      user_id: userId,
+      event_id: eventId,
+      checked_in: true,
+    };
     try {
-      const response = await axiosInstance.get('feed', {
-        headers: {
-          'Authorization': `Bearer ${currentUser.token}`,
-          'User-ID': currentUser.id,
+      const response = await axiosInstance.post('attendances', { attendance: attendanceValues });
+      console.log('Attendance created successfully:', response.data);
+      setCheckedInEvents([...checkedInEvents, eventId]);
+    } catch (error) {
+      console.error('Error creating attendance:', error);
+    }
+  };
+
+  const handleViewEventClick = (eventId) => {
+    navigation.navigate('EventShow', { id: eventId });
+  };
+
+  const isFutureEvent = (eventDate) => {
+    const currentDate = new Date();
+    return new Date(eventDate) > currentDate;
+  };
+
+  const checkIfCheckedIn = async (eventId) => {
+    try {
+      const response = await axiosInstance.get(`attendances/checked_in`, {
+        params: {
+          user_id: currentUser.id,
+          event_id: eventId,
         },
       });
-      setFeedItems(response.data);
-      setFilteredFeedItems(response.data);
+      return response.data.checked_in;
     } catch (error) {
-      console.error('Error fetching feed items:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error checking if user is checked in:', error);
+      return false;
     }
   };
 
-  const handleSearch = () => {
-    const filtered = feedItems.filter(item => 
-      item.beer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.bar_country?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.user_handle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.bar_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredFeedItems(filtered);
-  };
+  if (loading) {
+    return <ActivityIndicator size="large" color="#AF8F6F" />;
+  }
 
-  const handleViewClick = (id) => {
-    navigation.navigate('BeerShow', { id });
-  };
-
-  const renderItem = ({ item }) => {
-    if (item.type === 'event_picture') {
-      return (
-        <View style={styles.postContainer}>
-          <Image source={{ uri: item.picture_url }} style={styles.image} />
-          {item.user_handle && (
-            <Text>
-              <Text style={styles.boldText}>{item.user_handle}</Text>: {item.description}
-            </Text>
-          )}
-          <TouchableOpacity
-            style={styles.viewButton}
-            onPress={() => navigation.navigate('EventShow', { id: item.event_id })}
-          >
-            <Text style={styles.viewButtonText}>View Event</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else if (item.type === 'review') {
-      const address = item.bar_address && item.bar_address.line1
-        ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}`.trim()
-        : 'N/A';
-      return (
-        <View style={styles.reviewContainer}>
-          <View style={styles.reviewHeader}>
-            <Text style={styles.userName}>{item.user_handle || 'Anonymous'}</Text>
-          </View>
-          <View style={styles.reviewContent}>
-            {item.beer_name && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Beer:</Text> {item.beer_name}
-              </Text>
-            )}
-            {item.rating && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>User Rating:</Text> {item.rating}⭐
-              </Text>
-            )}
-            {item.global_rating && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Global Rating:</Text> {item.global_rating}⭐
-              </Text>
-            )}
-            {item.created_at && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Reviewed at:</Text> {item.created_at}
-              </Text>
-            )}
-            {item.bar_name !== 'N/A' && item.bar_name && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Bar:</Text> {item.bar_name}
-              </Text>
-            )}
-            {item.bar_country !== 'N/A' && item.bar_country && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Country:</Text> {item.bar_country}
-              </Text>
-            )}
-            {address && address !== 'N/A' && (
-              <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Address:</Text> {address}
-              </Text>
-            )}
-            {item.beer_id && (
-              <TouchableOpacity
-                style={styles.viewButton}
-                onPress={() => handleViewClick(item.beer_id)}
-              >
-                <Text style={styles.viewButtonText}>View Beer</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      );
-    }
-    return null;
-  };
+  if (!bar) {
+    return <Text style={styles.message}>Bar not found.</Text>;
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Feed</Text>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Search</Text>
-        </TouchableOpacity>
-      </View>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : filteredFeedItems.length === 0 ? (
-        <Text>No feed items found.</Text>
-      ) : (
-        <FlatList
-          data={filteredFeedItems}
-          renderItem={renderItem}
-          keyExtractor={(item) => (item.id ? item.id.toString() : `key-${Math.random()}`)}
-          contentContainerStyle={styles.flatListContainer}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyContainer}>
-              <Text>No feed items available</Text>
-            </View>
-          )}
-        />
-      )}
-
-      {/* Modal for searching */}
-      <Modal visible={isModalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Search for a beer..."
-            value={searchTerm}
-            onChangeText={(text) => {
-              setSearchTerm(text);
-              handleSearch();
-            }}
-          />
-          <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-            <Text style={styles.closeModal}>Close</Text>
-          </TouchableOpacity>
+    currentUser ? (
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={true}
+      >
+        <View style={styles.paper}>
+          <View style={styles.box}>
+            <Text style={styles.title}>{bar.name}</Text>
+            <Text style={styles.subtitle}>{bar.address.line1 || 'N/A'}, {bar.address.line2 || 'N/A'}</Text>
+          </View>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: bar.image_url || "https://via.placeholder.com/400" }}
+              style={styles.image}
+            />
+          </View>
+          <View style={styles.box}>
+            <Text style={styles.description}>{bar.address.city || 'N/A'}, {bar.address.country ? bar.address.country.name : 'N/A'}</Text>
+            <Text style={styles.description}>Lat: {bar.latitude || 'N/A'}, Long: {bar.longitude || 'N/A'}</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={() => console.log('Go clicked')}>
+              <Text style={styles.buttonText}>Go</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => console.log('New Event clicked')}>
+              <Text style={styles.buttonText}>New Event</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => console.log('Favorite clicked')}>
+              <Text style={styles.buttonText}>Favorite</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </Modal>
-    </View>
+
+        <View style={styles.paper}>
+          <View style={styles.box}>
+            <Text style={styles.title}>Events</Text>
+            {events.length > 0 ? (
+              events.map(event => (
+                <View key={event.id} style={styles.eventBox}>
+                  <View>
+                    <Text style={styles.eventName}>{event.name}</Text>
+                    <Text style={styles.eventDate}>{new Date(event.date).toLocaleDateString()}</Text>
+                  </View>
+                  {isFutureEvent(event.date) && !checkedInEvents.includes(event.id) && (
+                    <TouchableOpacity style={styles.button} onPress={() => handleCheckinEvent(event.id)}>
+                      <Text style={styles.buttonText}>Check-in</Text>
+                    </TouchableOpacity>
+                  )}
+                  {checkedInEvents.includes(event.id) && (
+                    <TouchableOpacity style={styles.buttonCheckedIn}>
+                      <Text style={styles.buttonText2}>Checked</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity style={styles.button} onPress={() => handleViewEventClick(event.id)}>
+                    <Text style={styles.buttonText}>View</Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.message}>No events found.</Text>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    ) : (
+      <View style={styles.errorContainer}>
+        <Image
+          source={require('../../assets/beerLogo.png')}
+          style={styles.logo}
+        />
+        <Text style={styles.errorText}>Error 401</Text>
+      </View>
+    )
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     backgroundColor: '#F8F4E1',
-    padding: 20,
+    flexGrow: 1,
+  },
+  paper: {
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 4,
+  },
+  box: {
+    padding: 8,
+    marginBottom: 1,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
+    fontFamily: 'Belwe',
+    marginBottom: 8,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    borderColor: '#000',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  searchButton: {
-    marginLeft: 10,
-    backgroundColor: '#AF8F6F',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  searchButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  flatListContainer: {
-    flexGrow: 1,
-    padding: 10,
-  },
-  postContainer: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  reviewContainer: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  reviewHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  userName: {
+  subtitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    color: '#666',
   },
-  reviewText: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 6,
-  },
-  boldText: {
-    fontWeight: 'bold',
+  imageContainer: {
+    position: 'relative',
   },
   image: {
     width: '100%',
     height: 200,
-    borderRadius: 8,
-    marginBottom: 12,
+    resizeMode: 'cover',
   },
-  postDescription: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
-    lineHeight: 20,
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
   },
-  viewButton: {
-    marginTop: 10,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  button: {
     backgroundColor: '#AF8F6F',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-  },
-  viewButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 4,
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 20,
+    flex: 1,
+    marginHorizontal: 4,
   },
-  input: {
+  buttonCheckedIn: {
+    backgroundColor: '#F8F4E1',
+    padding: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 4,
+  },
+  buttonText: {
+    color: 'white',
+    fontFamily: 'Belwe',
+  },
+  buttonText2: {
+    color: 'black',
+    fontFamily: 'Belwe',
+  },
+  eventBox: {
+    padding: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 10,
-    width: '80%',
-    alignSelf: 'center',
-  },
-  modalOption: {
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginVertical: 5,
-    borderRadius: 10,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  closeModal: {
-    marginTop: 15,
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  emptyContainer: {
+    borderRadius: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
+    marginBottom: 5,
   },
-  loadingContainer: {
+  eventName: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#666',
+  },
+  message: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginVertical: 16,
+  },
+  errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 16,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+  },
+  errorText: {
+    fontSize: 32,
+    fontFamily: 'Belwe',
+    color: '#000',
   },
 });
 
-export default FeedScreen;
+export default BarShow;

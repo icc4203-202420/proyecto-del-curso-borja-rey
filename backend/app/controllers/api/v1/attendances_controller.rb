@@ -1,7 +1,7 @@
 class API::V1::AttendancesController < ApplicationController
   respond_to :json
   before_action :set_event, only: [:create]
-  before_action :set_user, only: [:create]
+  before_action :set_user, only: [:create, :checked_in]
   before_action :set_attendance, only: [:show, :update, :destroy]
 
   # GET /attendances
@@ -52,13 +52,23 @@ class API::V1::AttendancesController < ApplicationController
     @attendance = @user.attendances.new(attendance_params)
     @user_attendance = Attendance.where(user: @user, event: @event)
     if @user_attendance.exists?
-      render json: { error: "User already is attending this event" }, status: :unprocessable_entity
+      render json: { checked_in: true, event_id: @event.id }
     else
       if @attendance.save
-        render json: @attendance, status: :created, location: api_v1_attendance_url(@attendance)
+        render json: { attendance: @attendance, checked_in: true, event_id: @event.id }
       else
         render json: @attendance.errors, status: :unprocessable_entity
       end
+    end
+  end
+
+  # GET /attendances/checked_in
+  def checked_in
+    @attendance = Attendance.find_by(user: @user, event_id: params[:event_id])
+    if @attendance
+      render json: { checked_in: true }
+    else
+      render json: { checked_in: false }
     end
   end
 

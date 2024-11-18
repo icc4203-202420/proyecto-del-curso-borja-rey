@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useReducer } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { IP_BACKEND } from '@env';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
 
@@ -34,6 +33,7 @@ function BarShow() {
   const route = useRoute();
   const { id } = route.params;
   const [bar, setBar] = useState(null);
+  const [checkedInEvents, setCheckedInEvents] = useState([]);
   const { currentUser } = useContext(UserContext);
 
   const [state, dispatch] = useReducer(eventsReducer, initialState);
@@ -61,9 +61,19 @@ function BarShow() {
       }
     };
 
+    const fetchCheckedInEvents = async () => {
+      try {
+        const response = await axiosInstance.get(`users/${currentUser.id}/checked_in_events`);
+        setCheckedInEvents(response.data.checked_in_events || []);
+      } catch (error) {
+        console.error('Error fetching checked-in events:', error);
+      }
+    };
+
     fetchBar();
     fetchEvents();
-  }, [id]);
+    fetchCheckedInEvents();
+  }, [id, currentUser]);
 
   const handleCheckinEvent = async (eventId) => {
     const userId = currentUser.id;
@@ -75,6 +85,7 @@ function BarShow() {
     try {
       const response = await axiosInstance.post('attendances', { attendance: attendanceValues });
       console.log('Attendance created successfully:', response.data);
+      setCheckedInEvents([...checkedInEvents, eventId]);
     } catch (error) {
       console.error('Error creating attendance:', error);
     }
@@ -82,6 +93,26 @@ function BarShow() {
 
   const handleViewEventClick = (eventId) => {
     navigation.navigate('EventShow', { id: eventId });
+  };
+
+  const isFutureEvent = (eventDate) => {
+    const currentDate = new Date();
+    return new Date(eventDate) > currentDate;
+  };
+
+  const checkIfCheckedIn = async (eventId) => {
+    try {
+      const response = await axiosInstance.get(`attendances/checked_in`, {
+        params: {
+          user_id: currentUser.id,
+          event_id: eventId,
+        },
+      });
+      return response.data.checked_in;
+    } catch (error) {
+      console.error('Error checking if user is checked in:', error);
+      return false;
+    }
   };
 
   if (loading) {
@@ -137,9 +168,16 @@ function BarShow() {
                     <Text style={styles.eventName}>{event.name}</Text>
                     <Text style={styles.eventDate}>{new Date(event.date).toLocaleDateString()}</Text>
                   </View>
-                  <TouchableOpacity style={styles.button} onPress={() => handleCheckinEvent(event.id)}>
-                    <Text style={styles.buttonText}>Check-in</Text>
-                  </TouchableOpacity>
+                  {isFutureEvent(event.date) && !checkedInEvents.includes(event.id) && (
+                    <TouchableOpacity style={styles.button} onPress={() => handleCheckinEvent(event.id)}>
+                      <Text style={styles.buttonText}>Check-in</Text>
+                    </TouchableOpacity>
+                  )}
+                  {checkedInEvents.includes(event.id) && (
+                    <TouchableOpacity style={styles.buttonCheckedIn}>
+                      <Text style={styles.buttonText2}>Checked</Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity style={styles.button} onPress={() => handleViewEventClick(event.id)}>
                     <Text style={styles.buttonText}>View</Text>
                   </TouchableOpacity>
@@ -216,8 +254,20 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
   },
+  buttonCheckedIn: {
+    backgroundColor: '#F8F4E1',
+    padding: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 4,
+  },
   buttonText: {
     color: 'white',
+    fontFamily: 'Belwe',
+  },
+  buttonText2: {
+    color: 'black',
     fontFamily: 'Belwe',
   },
   eventBox: {
@@ -231,6 +281,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   eventName: {
+    marginLeft: 8,
     fontSize: 16,
     fontWeight: 'bold',
   },

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
 
-// Validación del formulario usando Yup
+// ValidaciÃ³n del formulario usando Yup
 const EventPictureSchema = yup.object({
   description: yup.string().required('Description is required'),
   image: yup.mixed().required('Image is required')
@@ -152,17 +152,13 @@ const CreatePicture = () => {
               <Text style={styles.errorText}>{errors.image}</Text>
             )}
 
-            {isSubmitting ? (
-              <ActivityIndicator size="large" color="#AF8F6F" />
-            ) : (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handleSubmit}
-                disabled={isSubmitting}
-              >
-                <Text style={styles.buttonText}>Submit</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+            >
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
 
             {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
           </View>
