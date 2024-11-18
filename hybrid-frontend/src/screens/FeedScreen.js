@@ -26,7 +26,17 @@ const FeedScreen = () => {
         // Handle new data from the WebSocket channel
         const newFeedItem = data.event_picture || data.review;
         if (newFeedItem) {
-          setFeedItems((prevFeedItems) => [newFeedItem, ...prevFeedItems]);
+          console.log('New feed item');
+          setFeedItems((prevFeedItems) => {
+            const updatedFeedItems = [newFeedItem, ...prevFeedItems];
+            setFilteredFeedItems(updatedFeedItems.filter(item => 
+              item.beer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              item.bar_country?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              item.user_handle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              item.bar_name?.toLowerCase().includes(searchTerm.toLowerCase())
+            ));
+            return updatedFeedItems;
+          });
         }
       },
     });
@@ -34,11 +44,7 @@ const FeedScreen = () => {
     return () => {
       channel.unsubscribe();
     };
-  }, []);
-
-  useEffect(() => {
-    fetchFeedItems();
-  }, []);
+  }, [searchTerm]);
 
   const fetchFeedItems = async () => {
     setLoading(true);
