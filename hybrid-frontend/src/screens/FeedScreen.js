@@ -152,6 +152,7 @@ const FeedScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Feed</Text>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}

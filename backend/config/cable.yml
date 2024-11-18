@@ -1,9 +1,8 @@
 development:
   adapter: async
-
   allowed_request_origins:
     - 'http://localhost:3000'
-    - <% ENV['CABLE_URL'] %>
+    - /http:\/\/.*\.ngrok-free\.app/
 
 test:
   adapter: test
