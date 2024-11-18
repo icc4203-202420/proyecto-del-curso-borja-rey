@@ -40,7 +40,7 @@ class API::V1::EventPicturesController < ApplicationController
         type: 'event_picture',
         picture_url: @event_picture.picture.attached? ? url_for(@event_picture.picture) : nil
       )
-      ActionCable.server.broadcast 'feed_channel', event_picture: event_picture_data
+      ActionCable.server.broadcast('feed_channel', event_picture_data)
       render json: @event_picture, status: :created
     else
       render json: @event_picture.errors, status: :unprocessable_entity

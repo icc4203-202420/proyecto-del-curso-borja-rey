@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -152,13 +152,17 @@ const CreatePicture = () => {
               <Text style={styles.errorText}>{errors.image}</Text>
             )}
 
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleSubmit}
-              disabled={isSubmitting}
-            >
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
+            {isSubmitting ? (
+              <ActivityIndicator size="large" color="#AF8F6F" />
+            ) : (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleSubmit}
+                disabled={isSubmitting}
+              >
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+            )}
 
             {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
           </View>

@@ -38,6 +38,17 @@ export default function BottomTabs() {
       )}
       {currentUser && (
         <Tab.Screen 
+          name="Feed" 
+          component={FeedScreen} 
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="newspaper-outline" color={color} size={size} />
+            ),
+          }}
+        />
+      )}
+      {currentUser && (
+        <Tab.Screen 
           name="Bars" 
           component={Bars} 
           options={{
@@ -54,17 +65,6 @@ export default function BottomTabs() {
           options={{
             tabBarIcon: ({ color, size }) => (
               <Icon name="people-outline" color={color} size={size} />
-            ),
-          }}
-        />
-      )}
-      {currentUser && (
-        <Tab.Screen 
-          name="Feed" 
-          component={FeedScreen} 
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="newspaper-outline" color={color} size={size} />
             ),
           }}
         />

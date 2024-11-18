@@ -21,6 +21,7 @@ class API::V1::FeedsController < ApplicationController
           }
         elsif item.is_a?(Review)
           bar = item.beer.bars.first
+          puts "bar: #{item.beer.bars.inspect}"
           global_rating = item.beer.reviews.average(:rating).to_f.round(2)
           {
             id: item.id,

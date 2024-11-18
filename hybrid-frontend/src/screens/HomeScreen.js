@@ -63,9 +63,6 @@ function Home({ navigation }) {
       </View>
       {currentUser ? (
         <>
-          <TouchableOpacity style={styles.mapButton} onPress={handleOpenMap}>
-            <Text style={styles.buttonText}>Open Map</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.searchButton} onPress={handleLogout}>
             <Text style={styles.buttonText}>Log out</Text>
           </TouchableOpacity>

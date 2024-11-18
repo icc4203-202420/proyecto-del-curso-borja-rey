@@ -19,10 +19,6 @@ class API::V1::ReviewsController < ApplicationController
 
   def create
     @review = @user.reviews.new(review_params)
-    puts "user: #{@user.handle}"
-    puts "beer: #{@beer.name}"
-    puts "user: #{@user.handle}"
-    puts "beer: #{@beer.name}"
     @user_review = Review.where(user: @user, beer: @beer)
     if @user_review.exists?
       puts "User already reviewed this beer"
@@ -36,7 +32,7 @@ class API::V1::ReviewsController < ApplicationController
           beer_name: @review.beer.name,
           global_rating: @review.beer.reviews.average(:rating).to_f.round(2) # Si quieres enviar esta información
         )
-        ActionCable.server.broadcast 'feed_channel', review: review_data
+        ActionCable.server.broadcast('feed_channel', review_data)
         render json: @review, status: :created, location: api_v1_review_url(@review)
       else
         render json: @review.errors, status: :unprocessable_entity

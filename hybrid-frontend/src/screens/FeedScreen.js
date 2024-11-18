@@ -7,27 +7,15 @@ import axiosInstance from '../context/urlContext';
 const FeedScreen = () => {
   const [feedItems, setFeedItems] = useState([]);
   const [filteredFeedItems, setFilteredFeedItems] = useState([]);
-  const [filter, setFilter] = useState(null);
-  const [friends, setFriends] = useState([]);
-  const [bars, setBars] = useState([]);
-  const [countries, setCountries] = useState([]);
-  const [searchBeer, setSearchBeer] = useState('');
-  const [beerResults, setBeerResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [subModalVisible, setSubModalVisible] = useState(false);
-  const [filterType, setFilterType] = useState('');
+  const [beerResults, setBeerResults] = useState([]);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Carga inicial de datos
-    fetchInitialData();
+    fetchFeedItems();
   }, []);
-
-  const fetchInitialData = async () => {
-    await Promise.all([fetchFeedItems(), fetchFriends(), fetchBars()]);
-    fetchCountries();
-  };
 
   const fetchFeedItems = async () => {
     try {
@@ -44,41 +32,11 @@ const FeedScreen = () => {
     }
   };
 
-  const fetchFriends = async () => {
-    try {
-      const response = await axiosInstance.get(`users/${currentUser.id}/friendships`, {
-        headers: {
-          'Authorization': `Bearer ${currentUser.token}`,
-        },
-      });
-      setFriends(response.data);
-    } catch (error) {
-      console.error('Error fetching friends:', error);
-    }
-  };
-
-  const fetchBars = async () => {
-    try {
-      const response = await axiosInstance.get('bars', {
-        headers: {
-          'Authorization': `Bearer ${currentUser.token}`,
-        },
-      });
-      setBars(response.data.bars);
-    } catch (error) {
-      console.error('Error fetching bars:', error);
-    }
-  };
-
-  const fetchCountries = () => {
-    const uniqueCountries = [...new Set(feedItems.map(item => item.bar_country))].filter(Boolean);
-    setCountries(uniqueCountries);
-  };
-
   const searchBeerByName = async (query) => {
     try {
       if (query.trim() === '') {
         setBeerResults([]);
+        setFilteredFeedItems(feedItems);
         return;
       }
       const response = await axiosInstance.get(`beers/search?name=${query}`, {
@@ -87,80 +45,101 @@ const FeedScreen = () => {
         },
       });
       setBeerResults(response.data.beers);
+      setFilteredFeedItems(
+        feedItems.filter(item => item.beer_name?.toLowerCase().includes(query.toLowerCase()))
+      );
     } catch (error) {
       console.error('Error searching beers:', error);
     }
   };
 
-  const applyFilter = (type, value) => {
-    setFilter({ type, value });
-    const newFilteredItems = feedItems.filter(item => {
-      if (type === 'friend' && item.user_handle === value) return true;
-      if (type === 'bar' && item.bar_id === value) return true;
-      if (type === 'country' && item.bar_country === value) return true;
-      if (type === 'beer' && item.beer_name === value) return true;
-      return false;
-    });
-    setFilteredFeedItems(newFilteredItems);
-    setIsModalVisible(false);
-    setSubModalVisible(false);
-  };
-
-  const clearFilter = () => {
-    setFilter(null);
-    setFilteredFeedItems(feedItems);
+  const handleViewClick = (id) => {
+    navigation.navigate('BarShow', { id });
   };
 
   const renderItem = ({ item }) => {
+    
     if (item.type === 'event_picture') {
       return (
-        <TouchableOpacity onPress={() => navigation.navigate('EventShow', { id: item.event_id })}>
           <View style={styles.postContainer}>
-            <Image source={{ uri: item.picture_url }} style={styles.image} />
-            <Text style={styles.description}>{item.description}</Text>
-            {item.user_handle && <Text style={styles.user}>{item.user_handle}</Text>}
+        <Image source={{ uri: item.picture_url }} style={styles.image} />
+        {item.user_handle && (
+          <Text>
+            <Text style={styles.boldText}>{item.user_handle}</Text>: {item.description}
+          </Text>
+        )}
+        <TouchableOpacity
+            style={styles.viewButton}
+            onPress={() => navigation.navigate('EventShow', { id: item.event_id })}
+          >
+            <Text style={styles.viewButtonText}>View Bar</Text>
+          </TouchableOpacity>
           </View>
-        </TouchableOpacity>
       );
     } else if (item.type === 'review') {
       const address = item.bar_address && item.bar_address.line1
         ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}`.trim()
         : 'N/A';
       return (
-        <TouchableOpacity onPress={() => navigation.navigate('BarShow', { id: item.bar_id })}>
-          <View style={styles.postContainer}>
-            <Text style={styles.description}>Friend: {item.user_handle}</Text>
-            <Text style={styles.description}>Beer: {item.beer_name}</Text>
-            <Text style={styles.description}>User Rating: {item.rating} stars</Text>
-            <Text style={styles.description}>Global Rating: {item.global_rating} stars</Text>
-            <Text style={styles.description}>Reviewed at: {item.created_at}</Text>
-            <Text style={styles.description}>Bar: {item.bar_name}</Text>
-            <Text style={styles.description}>Country: {item.bar_country || 'N/A'}</Text>
-            <Text style={styles.description}>Address: {address}</Text>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('BarShow', { id: item.bar_id })}
-            >
-              <Text style={styles.buttonText}>View Bar</Text>
-            </TouchableOpacity>
+        <View style={styles.reviewContainer}>
+          <View style={styles.reviewHeader}>
+            <Text style={styles.userName}>{item.user_handle || 'Anonymous'}</Text>
           </View>
-        </TouchableOpacity>
+          <View style={styles.reviewContent}>
+            {item.beer_name && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>Beer:</Text> {item.beer_name}
+              </Text>
+            )}
+            {item.rating && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>User Rating:</Text> {item.rating}⭐
+              </Text>
+            )}
+            {item.global_rating && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>Global Rating:</Text> {item.global_rating}⭐
+              </Text>
+            )}
+            {item.created_at && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>Reviewed at:</Text> {item.created_at}
+              </Text>
+            )}
+            {item.bar_name !== 'N/A' && item.bar_name && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>Bar:</Text> {item.bar_name}
+              </Text>
+            )}
+            {item.bar_country !== 'N/A' && item.bar_country && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>Country:</Text> {item.bar_country}
+              </Text>
+            )}
+            {address && address !== 'N/A' && (
+              <Text style={styles.reviewText}>
+                <Text style={styles.boldText}>Address:</Text> {address}
+              </Text>
+            )}
+            {item.bar_id && (
+              <TouchableOpacity
+                style={styles.viewButton}
+                onPress={() => handleViewClick(item.bar_id)}
+              >
+                <Text style={styles.viewButtonText}>View Bar</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
       );
     }
     return null;
   };
-  
-
-  const openFilterModal = (type) => {
-    setFilterType(type);
-    setSubModalVisible(true);
-  };
 
   return (
     <View style={styles.container}>
-      {/* Botón para abrir el filtro */}
       <TouchableOpacity style={styles.filterButton} onPress={() => setIsModalVisible(true)}>
-        <Text style={styles.filterButtonText}>Filter</Text>
+        <Text style={styles.filterButtonText}>Search</Text>
       </TouchableOpacity>
 
       <FlatList
@@ -175,73 +154,28 @@ const FeedScreen = () => {
         )}
       />
 
-      {/* Modal principal para seleccionar tipo de filtro */}
+      {/* Modal for searching */}
       <Modal visible={isModalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
-          <TouchableOpacity onPress={() => openFilterModal('friend')}>
-            <Text style={styles.modalOption}>Filter by Friend</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => openFilterModal('bar')}>
-            <Text style={styles.modalOption}>Filter by Bar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => openFilterModal('country')}>
-            <Text style={styles.modalOption}>Filter by Country</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => openFilterModal('beer')}>
-            <Text style={styles.modalOption}>Search by Beer</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={clearFilter}>
-            <Text style={styles.modalOption}>Clear Filter</Text>
-          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Search for a beer..."
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              searchBeerByName(text);
+            }}
+          />
+          <FlatList
+            data={beerResults}
+            keyExtractor={(beer) => beer.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => setFilteredFeedItems(feedItems.filter(feed => feed.beer_name === item.name))}>
+                <Text style={styles.modalOption}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
           <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-            <Text style={styles.closeModal}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-
-      {/* Submodal para opciones específicas de filtro */}
-      <Modal visible={subModalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          {filterType === 'friend' && friends.length > 0 && (
-            friends.map((friend) => (
-              <TouchableOpacity key={friend.id} onPress={() => applyFilter('friend', friend.handle)}>
-                <Text style={styles.modalOption}>{friend.handle}</Text>
-              </TouchableOpacity>
-            ))
-          )}
-          {filterType === 'bar' && bars.length > 0 && (
-            bars.map((bar) => (
-              <TouchableOpacity key={bar.id} onPress={() => applyFilter('bar', bar.id)}>
-                <Text style={styles.modalOption}>{bar.name}</Text>
-              </TouchableOpacity>
-            ))
-          )}
-          {filterType === 'country' && countries.length > 0 && (
-            countries.map((country) => (
-              <TouchableOpacity key={country} onPress={() => applyFilter('country', country)}>
-                <Text style={styles.modalOption}>{country}</Text>
-              </TouchableOpacity>
-            ))
-          )}
-          {filterType === 'beer' && (
-            <View>
-              <TextInput
-                style={styles.input}
-                placeholder="Search for a beer"
-                value={searchBeer}
-                onChangeText={(text) => {
-                  setSearchBeer(text);
-                  searchBeerByName(text);
-                }}
-              />
-              {beerResults.map((beer) => (
-                <TouchableOpacity key={beer.id} onPress={() => applyFilter('beer', beer.name)}>
-                  <Text style={styles.modalOption}>{beer.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-          <TouchableOpacity onPress={() => setSubModalVisible(false)}>
             <Text style={styles.closeModal}>Close</Text>
           </TouchableOpacity>
         </View>
@@ -253,48 +187,90 @@ const FeedScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    backgroundColor: '#F8F4E1',
+    backgroundColor: '#F0F0F5',
   },
   flatListContainer: {
     flexGrow: 1,
+    padding: 10,
   },
   postContainer: {
     marginBottom: 16,
     backgroundColor: '#fff',
-    borderRadius: 4,
+    borderRadius: 12,
     padding: 16,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  reviewContainer: {
+    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  reviewText: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 6,
+  },
+  boldText: {
+    fontWeight: 'bold',
   },
   image: {
     width: '100%',
     height: 200,
     borderRadius: 8,
+    marginBottom: 12,
   },
-  description: {
-    marginTop: 8,
+  postDescription: {
     fontSize: 16,
     color: '#333',
-  },
-  user: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#666',
+    marginBottom: 8,
+    lineHeight: 20,
   },
   filterButton: {
     backgroundColor: '#007AFF',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 10,
+    alignSelf: 'flex-end',
+    margin: 10,
   },
   filterButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  viewButton: {
+    marginTop: 10,
+    backgroundColor: '#AF8F6F',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+  },
+  viewButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
@@ -303,23 +279,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 20,
   },
-  modalOption: {
-    backgroundColor: '#fff',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-  },
-  closeModal: {
-    marginTop: 10,
-    color: '#fff',
-  },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
-    padding: 10,
+    padding: 12,
     marginBottom: 10,
-    borderRadius: 5,
-    width: 200,
+    borderRadius: 10,
+    width: '80%',
+    alignSelf: 'center',
+  },
+  modalOption: {
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginVertical: 5,
+    borderRadius: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  closeModal: {
+    marginTop: 15,
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
   emptyContainer: {
     alignItems: 'center',
