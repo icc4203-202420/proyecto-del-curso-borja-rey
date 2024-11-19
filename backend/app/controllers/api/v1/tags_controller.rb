@@ -1,8 +1,4 @@
 class API::V1::TagsController < ApplicationController
-  def new
-    @tag = Tag.new
-  end
-
   def create
     @tag = Tag.new(tag_params)
 
@@ -14,7 +10,8 @@ class API::V1::TagsController < ApplicationController
   end
 
   private
-    def tag_params
-      params.require(:tag).permit(:event_picture_id, :tagged_user_id, :tagged_by_id)
-    end
+
+  def tag_params
+    params.require(:tag).permit(:event_picture_id, :tagged_user_id, :tagged_by_id)
+  end
 end

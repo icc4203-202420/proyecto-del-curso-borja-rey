@@ -1,2 +1,2 @@
-const webSocketURL = 'wss://c1d7-200-124-57-6.ngrok-free.app/cable';
+const webSocketURL = 'wss://7628-191-113-128-201.ngrok-free.app/cable';
 export default webSocketURL;
