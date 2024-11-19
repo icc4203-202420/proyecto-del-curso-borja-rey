@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, Pressable } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
-import { Video } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import axiosInstance from '../context/urlContext';
 
 const EventShow = () => {
@@ -16,6 +16,8 @@ const EventShow = () => {
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
   const urlDefinitivo = "https://www.w3schools.com/html/mov_bbb.mp4"
+
+  const videoPlayer = useVideoPlayer(); // Crea una instancia del reproductor de video
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -157,17 +159,13 @@ const EventShow = () => {
       >
         <View style={styles.modalView}>
           <View style={styles.videoContainer}>
-            <Video
-              source={{ uri: videoUrl }}
-              rate={1.0}
-              volume={1.0}
-              isMuted={false}
-              resizeMode="contain"  // Ajusta el video sin recortar
-              shouldPlay
-              useNativeControls
+            <VideoView
+              player={videoPlayer}
               style={styles.video}
-              onError={(error) => console.log("Error loading video:", error)}
+              allowsFullscreen
+              allowsPictureInPicture
             />
+            {videoPlayer.source !== videoUrl && videoPlayer.replace(videoUrl)}
           </View>
           <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
             <Text style={styles.buttonText}>Close</Text>

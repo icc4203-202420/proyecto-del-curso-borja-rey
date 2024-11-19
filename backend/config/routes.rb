@@ -42,6 +42,7 @@ Rails.application.routes.draw do
           get 'friendships'
           post 'friendships', to: 'users#create_friendship'
           post 'is_friend', to: 'users#is_friend'
+          get 'checked_in_events', to: 'users#checked_in_events'
         end
         collection do
           post 'save_push_token'
@@ -51,7 +52,11 @@ Rails.application.routes.draw do
       resources :notifications, only: [:create]
       resources :tags
       resources :event_pictures
-      resources :attendances
+      resources :attendances do
+        collection do
+          get 'checked_in', to: 'attendances#checked_in'
+        end
+      end
       resources :addresses
       resources :countries
       resources :reviews

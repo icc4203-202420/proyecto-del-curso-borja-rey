@@ -99,7 +99,6 @@ class API::V1::EventsController < ApplicationController
       return
     end
 
-    puts "-------!!!!----!!!!---!!!---Creating video..."
     Dir.mktmpdir do |dir|
       video_path = create_video_from_active_storage_images(@event_pictures, dir)
       if video_path && File.exist?(video_path)
@@ -156,7 +155,7 @@ class API::V1::EventsController < ApplicationController
 
     if image_files.any?
       puts "Starting ffmpeg command..."
-      system("ffmpeg -framerate 1/3 -i '#{dir}/image%03d.jpg' -s 1280x720 -c:v libx264 -pix_fmt yuv420p -movflags +faststart #{video_path}")
+      system("ffmpeg -framerate 1 -i '#{dir}/image%03d.jpg' -s 1280x720 -c:v libx264 -pix_fmt yuv420p -movflags +faststart #{video_path}")
 
       if File.exist?(video_path)
         puts "Video successfully created at: #{video_path}"

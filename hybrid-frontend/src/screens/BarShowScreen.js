@@ -61,18 +61,8 @@ function BarShow() {
       }
     };
 
-    const fetchCheckedInEvents = async () => {
-      try {
-        const response = await axiosInstance.get(`users/${currentUser.id}/checked_in_events`);
-        setCheckedInEvents(response.data.checked_in_events || []);
-      } catch (error) {
-        console.error('Error fetching checked-in events:', error);
-      }
-    };
-
     fetchBar();
     fetchEvents();
-    fetchCheckedInEvents();
   }, [id, currentUser]);
 
   const handleCheckinEvent = async (eventId) => {

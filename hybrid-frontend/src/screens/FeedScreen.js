@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { UserContext } from '../context/UserContext';
 import axiosInstance from '../context/urlContext';
 import webSocketURL from '../context/webSocketURL';
@@ -15,9 +15,13 @@ const FeedScreen = () => {
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    fetchFeedItems();
+  useFocusEffect(
+    useCallback(() => {
+      fetchFeedItems();
+    }, [])
+  );
 
+  useEffect(() => {
     // Initialize Action Cable consumer for real-time updates
     console.log('Connecting to WebSocket:', webSocketURL);
     const cable = createConsumer(webSocketURL);
@@ -75,8 +79,12 @@ const FeedScreen = () => {
     setFilteredFeedItems(filtered);
   };
 
-  const handleViewClick = (id) => {
+  const handleViewBarClick = (id) => {
     navigation.navigate('BarShow', { id });
+  };
+
+  const handleViewEventClick = (id) => {
+    navigation.navigate('EventShow', { id });
   };
 
   const renderItem = ({ item }) => {
@@ -91,7 +99,7 @@ const FeedScreen = () => {
           )}
           <TouchableOpacity
             style={styles.viewButton}
-            onPress={() => navigation.navigate('EventShow', { id: item.event_id })}
+            onPress={() => handleViewEventClick(item.event_id)}
           >
             <Text style={styles.viewButtonText}>View Event</Text>
           </TouchableOpacity>
@@ -145,7 +153,7 @@ const FeedScreen = () => {
             {item.bar_id && (
               <TouchableOpacity
                 style={styles.viewButton}
-                onPress={() => handleViewClick(item.bar_id)}
+                onPress={() => handleViewBarClick(item.bar_id)}
               >
                 <Text style={styles.viewButtonText}>View Bar</Text>
               </TouchableOpacity>
