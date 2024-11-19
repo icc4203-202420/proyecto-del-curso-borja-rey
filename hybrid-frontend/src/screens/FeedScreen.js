@@ -140,9 +140,7 @@ const FeedScreen = () => {
         </View>
       );
     } else if (item.type === 'review') {
-      const address = item.bar_address && item.bar_address.line1
-        ? `${item.bar_address.line1 || ''}, ${item.bar_address.line2 || ''}, ${item.bar_address.city || ''}`.trim()
-        : 'N/A';
+      console.log("add: ", item.bar_address);
       return (
         <View style={styles.reviewContainer}>
           <View style={styles.reviewHeader}>
@@ -179,9 +177,9 @@ const FeedScreen = () => {
                 <Text style={styles.boldText}>Country:</Text> {item.bar_country}
               </Text>
             )}
-            {address && address !== 'N/A' && (
+            {item.bar_address && (
               <Text style={styles.reviewText}>
-                <Text style={styles.boldText}>Address:</Text> {address}
+                <Text style={styles.boldText}>Address:</Text> {item.bar_address}
               </Text>
             )}
             {item.bar_id && (
