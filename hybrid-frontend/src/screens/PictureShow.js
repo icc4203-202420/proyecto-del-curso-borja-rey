@@ -5,10 +5,11 @@ import { Formik, Field } from 'formik';
 import * as yup from 'yup';
 import axiosInstance from '../context/urlContext';
 import { UserContext } from '../context/UserContext';
-// Validación del formulario usando Yup
+
 const TagSchema = yup.object({
   user_id: yup.number().required('User is required'),
 });
+
 function PictureShow() {
   const route = useRoute();
   const { id } = route.params;
@@ -21,9 +22,11 @@ function PictureShow() {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const { currentUser } = useContext(UserContext);
   const navigation = useNavigation();
+
   const handleViewProfileClick = (userId) => {
     navigation.navigate('UserShow', { id: userId });
   };
+
   const fetchTags = async () => {
     try {
       const response = await axiosInstance.get(`event_pictures/${id}`);
@@ -61,109 +64,113 @@ function PictureShow() {
     fetchUsers();
     fetchPicture();
   }, [id]);
-  useEffect(() => {
+
+  const handleSearch = () => {
     setFilteredUsers(
       users.filter(user => user.handle.toLowerCase().includes(searchText.toLowerCase())).slice(0, 3)
     );
-  }, [searchText, users]);
+    setIsDropdownVisible(true);
+  };
+
   return (
     currentUser ? (
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Picture</Text>
-        <View style={styles.pictureContainer}>
-          <Image
-            source={{ uri: picture.picture_url }}
-            style={styles.picture}
-          />
-          <Text style={styles.description}>{user.handle}: {picture.description}</Text>
-        </View>
-        <View style={styles.tagsContainer}>
-          <Text style={styles.subtitle}>Tags</Text>
-          <Formik
-            initialValues={{
-              user_id: ''
-            }}
-            validationSchema={TagSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              const tagValues = {
-                event_picture_id: picture.id,
-                tagged_user_id: values.user_id,
-                tagged_by_id: currentUser.id
-              };
-              fetch(`http://${IP_BACKEND}:3001/api/v1/tags`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ tag: tagValues }),
-              })
-                .then(response => response.json())
-                .then(data => {
-                  console.log('Tag created successfully:', data);
-                  setSubmitting(false);
-                  fetchTags(); // Actualizar la lista de etiquetas
-                })
-                .catch(error => {
-                  console.error('Error creating tag:', error);
-                  setSubmitting(false);
-                });
-            }}
-          >
-            {({ handleSubmit, setFieldValue, isSubmitting }) => (
-              <View style={styles.form}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search user by handle"
-                  value={searchText}
-                  onChangeText={setSearchText}
-                  onFocus={() => setIsDropdownVisible(true)}
-                  onBlur={() => setIsDropdownVisible(false)}
-                />
-                {isDropdownVisible && filteredUsers.length > 0 && (
-                  <View style={styles.dropdown}>
-                    {filteredUsers.map(user => (
-                      <TouchableOpacity
-                        key={user.id}
-                        onPress={() => {
-                          setFieldValue('user_id', user.id);
-                          setSearchText(user.handle);
-                          setFilteredUsers([]);
-                          setIsDropdownVisible(false);
-                        }}
-                        style={styles.dropdownItem}
-                      >
-                        <Text>{user.handle}</Text>
-                      </TouchableOpacity>
-                    ))}
+        <View style={styles.paper}>
+          <Text style={styles.title}>Picture</Text>
+          <View style={styles.pictureContainer}>
+            <Image
+              source={{ uri: picture.picture_url }}
+              style={styles.picture}
+            />
+            <Text style={styles.description}>{user.handle}: {picture.description}</Text>
+          </View>
+          <View style={styles.tagsContainer}>
+            <Text style={styles.subtitle}>Tags</Text>
+            <Formik
+              initialValues={{
+                user_id: ''
+              }}
+              validationSchema={TagSchema}
+              onSubmit={(values, { setSubmitting }) => {
+                const tagValues = {
+                  event_picture_id: picture.id,
+                  tagged_user_id: values.user_id,
+                  tagged_by_id: currentUser.id
+                };
+                axiosInstance.post('/api/v1/tags', { tag: tagValues })
+                  .then(response => {
+                    console.log('Tag created successfully:', response.data);
+                    setSubmitting(false);
+                    fetchTags(); // Actualizar la lista de etiquetas
+                  })
+                  .catch(error => {
+                    console.error('Error creating tag:', error);
+                    setSubmitting(false);
+                  });
+              }}
+            >
+              {({ handleSubmit, setFieldValue, isSubmitting }) => (
+                <View style={styles.form}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search user by handle"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                  />
+                  {isDropdownVisible && filteredUsers.length > 0 && (
+                    <View style={styles.dropdown}>
+                      {filteredUsers.map(user => (
+                        <TouchableOpacity
+                          key={user.id}
+                          onPress={() => {
+                            setFieldValue('user_id', user.id);
+                            setSearchText(user.handle);
+                            setFilteredUsers([]);
+                            setIsDropdownVisible(false);
+                          }}
+                          style={styles.dropdownItem}
+                        >
+                          <Text>{user.handle}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={styles.searchButton}
+                      onPress={handleSearch}
+                    >
+                      <Text style={styles.buttonText}>Search</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={handleSubmit}
+                      disabled={isSubmitting}
+                    >
+                      <Text style={styles.buttonText}>Tag</Text>
+                    </TouchableOpacity>
                   </View>
-                )}
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleSubmit}
-                  disabled={isSubmitting}
-                >
-                  <Text style={styles.buttonText}>Tag</Text>
-                </TouchableOpacity>
-              </View>
+                </View>
+              )}
+            </Formik>
+            {tags.length > 0 ? (
+              tags.map(tag => (
+                <View key={tag.id} style={styles.tag}>
+                  <Text style={styles.tagText}>
+                    <Text style={styles.boldText}>{tag.tagged_by.handle}</Text>: {tag.tagged_user.handle}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.viewButton}
+                    onPress={() => handleViewProfileClick(tag.tagged_user.id)}
+                  >
+                    <Text style={styles.buttonText}>View</Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.message}>No Tags found.</Text>
             )}
-          </Formik>
-          {tags.length > 0 ? (
-            tags.map(tag => (
-              <View key={tag.id} style={styles.tag}>
-                <Text style={styles.tagText}>
-                  <Text style={styles.boldText}>{tag.tagged_by.handle}</Text>: {tag.tagged_user.handle}
-                </Text>
-                <TouchableOpacity
-                  style={styles.viewButton}
-                  onPress={() => handleViewProfileClick(tag.tagged_user.id)}
-                >
-                  <Text style={styles.buttonText}>View</Text>
-                </TouchableOpacity>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.message}>No Tags found.</Text>
-          )}
+          </View>
         </View>
       </ScrollView>
     ) : (
@@ -177,11 +184,19 @@ function PictureShow() {
     )
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#F8F4E1',
+  },
+  paper: {
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 4,
   },
   title: {
     fontSize: 24,
@@ -239,15 +254,30 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
   button: {
     backgroundColor: '#AF8F6F',
     padding: 12,
     borderRadius: 4,
     alignItems: 'center',
+    flex: 1,
+    marginLeft: 4,
   },
   buttonText: {
     color: 'white',
     fontFamily: 'Belwe',
+  },
+  searchButton: {
+    backgroundColor: '#AF8F6F',
+    padding: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 4,
   },
   tag: {
     flexDirection: 'row',
@@ -293,4 +323,5 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 });
+
 export default PictureShow;
