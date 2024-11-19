@@ -97,7 +97,7 @@ function PictureShow() {
                   tagged_user_id: values.user_id,
                   tagged_by_id: currentUser.id
                 };
-                axiosInstance.post('/api/v1/tags', { tag: tagValues })
+                axiosInstance.post('tags', { tag: tagValues })
                   .then(response => {
                     console.log('Tag created successfully:', response.data);
                     setSubmitting(false);

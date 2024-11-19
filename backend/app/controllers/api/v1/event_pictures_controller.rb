@@ -38,7 +38,9 @@ class API::V1::EventPicturesController < ApplicationController
     if @event_picture.save
       event_picture_data = @event_picture.as_json(include: [:user, :event]).merge(
         type: 'event_picture',
-        picture_url: @event_picture.picture.attached? ? url_for(@event_picture.picture) : nil
+        picture_url: @event_picture.picture.attached? ? url_for(@event_picture.picture) : nil,
+        tags: @event_picture.tags.as_json(include: [:tagged_by, :tagged_user]),
+        bar: @event_picture.event.bar
       )
       ActionCable.server.broadcast('feed_channel', event_picture_data)
       render json: @event_picture, status: :created

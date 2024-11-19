@@ -89,6 +89,7 @@ const FeedScreen = () => {
 
   const renderItem = ({ item }) => {
     if (item.type === 'event_picture') {
+      console.log("tags: ", item.tags);
       return (
         <View style={styles.postContainer}>
           <Image source={{ uri: item.picture_url }} style={styles.image} />
@@ -96,6 +97,39 @@ const FeedScreen = () => {
             <Text>
               <Text style={styles.boldText}>{item.user_handle}</Text>: {item.description}
             </Text>
+          )}
+          {item.event_name && (
+            <Text>
+              <Text style={styles.boldText}>Event</Text>: {item.event_name}
+            </Text>
+          )}
+
+          {item.bar_name && (
+            <Text>
+              <Text style={styles.boldText}>Bar</Text>: {item.bar_name}
+            </Text>
+          )}
+          {item.bar_country && (
+            <Text>
+              <Text style={styles.boldText}>Country</Text>: {item.bar_country}
+            </Text>
+          )}
+          {item.created_at && (
+            <Text>
+              <Text style={styles.boldText}>Posted time</Text>: {item.created_at}
+            </Text>
+          )}
+          {item.tags && item.tags.length > 0 && (
+            <View style={styles.tagsContainer}>
+              <Text style={styles.boldText}>Tags:</Text>
+              <View style={styles.tagsList}>
+                {item.tags.map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>@{tag.tagged_user.handle}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           )}
           <TouchableOpacity
             style={styles.viewButton}
@@ -220,6 +254,27 @@ const FeedScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  tagsContainer: {
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  tagsList: {
+    flexDirection: 'row', // Muestra los tags en línea
+    flexWrap: 'wrap', // Permite que los tags salten de línea si es necesario
+  },
+  tag: {
+    backgroundColor: '#EFEFEF', // Fondo gris claro
+    borderRadius: 16, // Bordes redondeados
+    paddingVertical: 4, // Espaciado interno en la parte superior/inferior
+    paddingHorizontal: 12, // Espaciado interno en los laterales
+    marginRight: 8, // Espaciado entre tags
+    marginBottom: 8, // Espaciado vertical entre filas de tags
+    alignSelf: 'flex-start', // Alineación para que cada tag se ajuste a su contenido
+  },
+  tagText: {
+    fontSize: 14,
+    color: '#555', // Color del texto del tag
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F4E1',
@@ -364,6 +419,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 10,
   },
 });
 

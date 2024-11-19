@@ -17,6 +17,10 @@ class API::V1::FeedsController < ApplicationController
             user_handle: item.user.handle,
             description: item.description,
             event_id: item.event.id,
+            event_name: item.event.name,
+            tags: item.tags.as_json(include: [:tagged_by, :tagged_user]),
+            bar_country: item.event.bar.address ? Country.find_by(id: item.event.bar.address.country_id)&.name || 'N/A' : 'N/A',
+            bar_name: item.event.bar.name,
             created_at: item.created_at.strftime("%Y-%m-%d %H:%M:%S")
           }
         elsif item.is_a?(Review)
